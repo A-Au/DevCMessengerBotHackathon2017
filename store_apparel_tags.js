@@ -17,7 +17,8 @@ const apparel_items = [{
 	"Apparel" : ["Sarong", "Capris"],
 	"Color" : ["DarkSalmon", "DimGray", "LightSlateGray", "PaleVioletRed", "DarkGray"],
 	"Apparel_h" : ["Leggings", "Tights"],
-	"Color_h" : ["Purple"]
+	"Color_h" : ["Purple"],
+	"Color_hex": ["#eb5aa4", "#6a5572"]
 },
 
 // Ankle Strap Leggings
@@ -26,7 +27,8 @@ const apparel_items = [{
 	"Apparel" : ["Tights", "Capris", "Leggings"],
 	"Color" : ["Black"],
 	"Apparel_h" : [],
-	"Color_h" : []
+	"Color_h" : [],
+	"Color_hex": ["#261c1c", "#010101"]
 },
 
 // Anna High Performance Tank - Black
@@ -35,7 +37,8 @@ const apparel_items = [{
 	"Apparel" : ["Tank Top", "Sports Bra", "Bodysuit"],
 	"Color" : ["Black"],
 	"Apparel_h": [],
-	"Color_h": []
+	"Color_h": [],
+	"Color_hex": ["#030303"]
 },
 
 // Anna High Performance Tank - Lemon
@@ -44,7 +47,8 @@ const apparel_items = [{
 	"Apparel": ["Tank Top", "Sports Bra", "Bodysuit"],
 	"Color": ["PaleGoldenRod"],
 	"Apparel_h": [],
-	"Color_h": ["Lemon"]
+	"Color_h": ["Lemon"],
+	"Color_hex": ["#faf5b3", "#151626"]
 },
 
 // 3/4 Guggenheim Leggnings
@@ -53,7 +57,8 @@ const apparel_items = [{
 	"Apparel": ["Capris", "Tights", "Overalls"],
 	"Color": ["LightSteelBlue", "White", "DarkSlateBlue"],
 	"Apparel_h": ["Leggings"],
-	"Color_h": []
+	"Color_h": [],
+	"Color_hex": ["#91a4f0", "#2554a7"]
 },
 
 // Ambu Leggings
@@ -62,7 +67,8 @@ const apparel_items = [{
 	"Apparel": ["Capris", "Bodysuit", "Tights"],
 	"Color": ["DarkSlateGray", "RosyBrown", "Tan"],
 	"Apparel_h": ["Leggings"],
-	"Color_h": ["Pink"]
+	"Color_h": ["Pink"],
+	"Color_hex": ["#998e90", "#192c60"]
 },
 
 // Anise Leggings
@@ -71,7 +77,8 @@ const apparel_items = [{
 	"Apparel": ["Women's Shorts", "Capris", "Sarong"],
 	"Color": ["Black"],
 	"Apparel_h": ["Leggings", "Tights"],
-	"Color_h": ["DarkSlateBlue"]
+	"Color_h": ["DarkSlateBlue"],
+	"Color_hex": ["#383f5d", "#94a7ac"]
 },
 
 // Anna High Performance Leggings
@@ -80,7 +87,8 @@ const apparel_items = [{
 	"Apparel": ["Capris", "Tights", "Jumpsuit"],
 	"Color": ["PaleGoldenRod", "DimGray"],
 	"Apparel_h": ["Leggings"],
-	"Color_h": ["Black"]
+	"Color_h": ["Black"],
+	"Color_hex": ["#faf5b3", "#151626"]
 },
 
 // END OF PAGE 1
@@ -91,7 +99,8 @@ const apparel_items = [{
 	"Apparel": ["Jumpsuit", "Capris", "Tights", "Bodysuit", "Sports Bra"],
 	"Color": ["LightGray", "DarkSlateGray"],
 	"Apparel_h": ["Leggings"],
-	"Color_h": []
+	"Color_h": [],
+	"Color_hex", ["#698398", "#5e7686"]
 },
 
 // Aura Yoga Top
@@ -100,7 +109,8 @@ const apparel_items = [{
 	"Apparel": ["Tank Top", "Halter Top", "Tankini"],
 	"Color": ["Black", "LightSteelBlue", "SteelBlue", "DarkSlateBlue", "SlateGray", "DarkSeaGreen"],
 	"Apparel_h": [],
-	"Color_h": []
+	"Color_h": [],
+	"Color_hex": ["#aab55c", "#457ac4"]
 },
 
 // BIONIC CAPRI
@@ -109,7 +119,8 @@ const apparel_items = [{
 	"Apparel": ["Capris"],
 	"Color": ["Black"],
 	"Apparel_h": ["Leggings"],
-	"Color_h": []
+	"Color_h": [],
+	"Color_hex": ["#48403e", "#1d1e21"]
 },
 
 // Black Muse Lucy Printed Performance Leggings - Women
@@ -210,7 +221,8 @@ const apparel_items = [{
 	"Apparel": ["T-Shirt", "Activewear T Shirt"],
 	"Color": ["Brown"],
 	"Apparel_h": [],
-	"Color_h": ["PaleVioletRed"]
+	"Color_h": ["PaleVioletRed"],
+	"Color_hex": ["#c3303e", "#bc2836"]
 }
 
 // Colorful Lines Pattern Keep Fit Leggings
@@ -257,7 +269,8 @@ const apparel_items = [{
 	"Apparel": ["Women's Shorts", "Women's Board Shorts"],
 	"Color": ["Purple", "PaleVioletRed", "DarkSlateBlue"],
 	"Apparel_h": [],
-	"Color_h": []
+	"Color_h": [],
+	"Color_hex": ["#7e46a5", "#cf0067", "#9dd7cf"]
 }
 
 // Elephant Fleece Hoodie
@@ -266,7 +279,8 @@ const apparel_items = [{
 	"Apparel": ["Sweatshirt", "Hoodies", "Sweater"],
 	"Color": ["Gray", "White", "Plum"],
 	"Apparel_h": [],
-	"Color_h": []
+	"Color_h": [],
+	"Color_hex": ["#d7d2ca", "#333f47"]
 }
 
 // Esha Yoga Top
@@ -627,7 +641,8 @@ const apparel_items = [{
 	"Apparel": ["Wide Leg Pants", "Capris"],
 	"Color": ["Black"],
 	"Apparel_h": ["Sweatpants"],
-	"Color_h": ["DarkSlateBlue"]
+	"Color_h": ["DarkSlateBlue"],
+	"Color_hex": ["#141522", "#0f101b"]
 }
 
 // Navy Rushhour Capri
@@ -766,7 +781,8 @@ const apparel_items = [{
 	"Apparel": ["Turtleneck", "Sweatshirt", "Hoodies"],
 	"Color": ["Orchid", "Plum"],
 	"Apparel_h": [],
-	"Color_h": []
+	"Color_h": [],
+	"Color_hex": ["#ee50c1", "#e448b8"]
 }
 
 // Pink Street Lion T-Shirt
@@ -793,7 +809,8 @@ const apparel_items = [{
 	"Apparel": ["Capris", "Leggings", "Tights"],
 	"Color": ["PaleVioletRed"],
 	"Apparel_h": [],
-	"Color_h": []
+	"Color_h": [],
+	"Color_hex": ["#c86590", "#33172b"]
 }
 
 // RCRP T-Shirt
@@ -802,7 +819,8 @@ const apparel_items = [{
 	"Apparel": ["T-Shirt", "Activewear T Shirt"],
 	"Color": ["White"],
 	"Apparel_h": [],
-	"Color_h": []
+	"Color_h": [],
+	"Color_hex": ["#e0dddf"]
 }
 
 // RCRP Tank Top
@@ -811,7 +829,8 @@ const apparel_items = [{
 	"Apparel": ["Tank Top", "Halter Top"],
 	"Color": ["White"],
 	"Apparel_h": [],
-	"Color_h": []
+	"Color_h": [],
+	"Color_hex": ["dfded8"]
 }
 
 // Saana High Performance Capri
