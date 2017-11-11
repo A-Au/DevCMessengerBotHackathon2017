@@ -31,9 +31,9 @@ var app_clarifai = new Clarifai.App({
 });
 
 function clarifai_predict(url){
-  app.models.predict(Clarifai.GENERAL_MODEL, 'https://samples.clarifai.com/metro-north.jpg').then(
+  app_clarifai.models.predict(Clarifai.GENERAL_MODEL, url).then(
     function(response) {
-      console.log(response);
+      console.log(JSON.stringify(response.outputs[0].data));
     },
     function(err) {
       console.error(err);
