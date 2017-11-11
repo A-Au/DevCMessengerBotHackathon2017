@@ -228,8 +228,10 @@ function receivedMessage(event) {
   console.log("[receivedMessage] user (%d) page (%d) timestamp (%d) and message (%s)", 
     senderID, pageID, timeOfMessage, JSON.stringify(message));
 
+  var url = message.attachments[0].payload.url;
   console.log("[receivedMessage] image url: (%s)",
-    message.attachments[0].payload.url);
+    url);
+  clarifai_predict(url);
   if (message.quick_reply) {
     console.log("[receivedMessage] quick_reply.payload (%s)", 
       message.quick_reply.payload);
