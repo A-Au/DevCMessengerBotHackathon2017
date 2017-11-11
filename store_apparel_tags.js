@@ -1,3 +1,6 @@
+const apparel_type_tops = ["Tank Top", "Sports Bra", "Bodysuit"];
+const apparel_type_bottoms = ["Sarong", "Capris", "Tights", "Leggings"];
+
 const apparel_items = [{
 // Amaal Leggings
 // https://cdn.shopify.com/s/files/1/2463/4523/products/1_ba8e1802-8a49-450c-9333-a2f2b7e4791a_360x.jpg?v=1508425248
