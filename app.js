@@ -30,6 +30,17 @@ var app_clarifai = new Clarifai.App({
  apiKey: 'cc1cdb1c7b6145dc868d5e00b8965594'
 });
 
+function clarifai_predict(url){
+  app.models.predict(Clarifai.GENERAL_MODEL, 'https://samples.clarifai.com/metro-north.jpg').then(
+    function(response) {
+      console.log(response);
+    },
+    function(err) {
+      console.error(err);
+    }
+  );
+}
+
 /*
  * Open config/default.json and set your config values before running this code. 
  * You can also set them using environment variables.
@@ -217,6 +228,8 @@ function receivedMessage(event) {
   console.log("[receivedMessage] user (%d) page (%d) timestamp (%d) and message (%s)", 
     senderID, pageID, timeOfMessage, JSON.stringify(message));
 
+  console.log("[receivedMessage] image url: (%s)",
+    message.attachments[0].payload.url);
   if (message.quick_reply) {
     console.log("[receivedMessage] quick_reply.payload (%s)", 
       message.quick_reply.payload);
