@@ -256,7 +256,7 @@ function receivedMessage(event) {
     prediction.colour.then(res => console.log("aaaa" + typeof res.colors[0].w3c.name));
     console.log(typeof type);
     console.log(type);
-    col.then(co => type.then(ty => sendTextMessage(senderID, 'Nice ' + co + ' ' + ty)));
+    col.then(co => type.then(ty => sendTextMessage(senderID, 'Nice ' + co.toLowerCase() + ' ' + ty.toLowerCase())));
   }
 
   var messageText = message.text;
