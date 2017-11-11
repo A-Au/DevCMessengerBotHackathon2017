@@ -18,12 +18,17 @@ const
   https = require('https'),  
   request = require('request'),
   Shopify = require('shopify-api-node');
+  Clarifai = require('clarifai');
 
 var app = express();
 app.set('port', process.env.PORT || 5000);
 app.set('view engine', 'ejs');
 app.use(bodyParser.json({ verify: verifyRequestSignature }));
 app.use(express.static('public'));
+
+var app_clarifai = new Clarifai.App({
+ apiKey: 'cc1cdb1c7b6145dc868d5e00b8965594'
+});
 
 /*
  * Open config/default.json and set your config values before running this code. 
