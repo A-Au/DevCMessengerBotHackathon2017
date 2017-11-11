@@ -251,12 +251,14 @@ function receivedMessage(event) {
   }
 
   if (prediction) {
-    const col = prediction.colour.then(res => res.colors[0].w3c.name);
-    const type = prediction.apparel_type.then(res => res.concepts[0].name);
+    const col = prediction.colour.then(res => res.colors);//[0].w3c.name);
+    const type = prediction.apparel_type.then(res => res.concepts);//[0].name);
     prediction.colour.then(res => console.log("aaaa" + typeof res.colors[0].w3c.name));
     console.log(typeof type);
     console.log(type);
-    col.then(co => type.then(ty => sendTextMessage(senderID, 'Nice ' + co.toLowerCase() + ' ' + ty.toLowerCase())));
+    col.then(co => type.then(ty => sendTextMessage(senderID, 'Nice ' + co[0].w3c.name.toLowerCase() + ' ' +
+     co[1].w3c.name.toLowerCase() + ' '  + co[2].w3c.name.toLowerCase() + ' ' + ty[0].name.toLowerCase() + ' ' + ty[1].name.toLowerCase()
+     + ' ' + ty[2].name.toLowerCase())));
   }
 
   var messageText = message.text;
