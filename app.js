@@ -31,14 +31,23 @@ var app_clarifai = new Clarifai.App({
 });
 
 function clarifai_predict(url){
-  app_clarifai.models.predict(Clarifai.COLOR_MODEL, url).then(
-    function(response) {
-      console.log(JSON.stringify(response.outputs[0].data));
-    },
-    function(err) {
-      console.error(err);
-    }
-  );
+  var colour = app_clarifai.models.predict(Clarifai.COLOR_MODEL, url).then(
+      (response, error) => {
+        return response.outputs[0].data;
+      }
+    );
+  var apparel_type = app_clarifai.models.predict(Clarifai.APPAREL_MODEL, url).then(
+        (response, error) => {
+          // console.log(JSON.stringify(response.outputs[0].data));
+          return response.outputs[0].data;
+        }
+      );
+
+  const prediction = { colour, apparel_type };
+  console.log(JSON.stringify(prediction.colour.then(res => res)));
+  //prediction.then(r => r.colour.then(res => console.log("aaaa" + JSON.stringify(res))));
+  console.log("a");
+  return prediction;
 }
 
 /*
@@ -231,12 +240,23 @@ function receivedMessage(event) {
   var url = message.attachments[0].payload.url;
   console.log("[receivedMessage] image url: (%s)",
     url);
-  clarifai_predict(url);
+  var prediction = clarifai_predict(url);
+  console.log("djsbf;djksbfsd");
+  console.log(JSON.stringify(prediction));
   if (message.quick_reply) {
     console.log("[receivedMessage] quick_reply.payload (%s)", 
       message.quick_reply.payload);
     handleQuickReplyResponse(event);
     return;
+  }
+
+  if (prediction) {
+    const col = prediction.colour.then(res => res.colors[0].w3c.name);
+    const type = prediction.apparel_type.then(res => res.concepts[0].name);
+    prediction.colour.then(res => console.log("aaaa" + typeof res.colors[0].w3c.name));
+    console.log(typeof type);
+    console.log(type);
+    col.then(co => type.then(ty => sendTextMessage(senderID, 'Nice ' + co + ' ' + ty)));
   }
 
   var messageText = message.text;
