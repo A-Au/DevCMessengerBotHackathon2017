@@ -256,9 +256,39 @@ function receivedMessage(event) {
     prediction.colour.then(res => console.log("aaaa" + typeof res.colors[0].w3c.name));
     console.log(typeof type);
     console.log(type);
-    col.then(co => type.then(ty => sendTextMessage(senderID, 'Nice ' + co[0].w3c.name.toLowerCase() + ' ' +
-     co[1].w3c.name.toLowerCase() + ' '  + co[2].w3c.name.toLowerCase() + ' ' + ty[0].name.toLowerCase() + ' ' + ty[1].name.toLowerCase()
-     + ' ' + ty[2].name.toLowerCase())));
+    // co - list of colors
+    // ty - list of types
+    col.then(co => type.then(ty => {
+      // Determine proper category for the piece of clothing
+      var TOP = 1;
+      var BOTTOM = 2;
+      var FOOTWEAR = 3;
+      var idx = -1;
+      // check bottoms
+      idx = ty.indexOf(apparel_bottoms[i]);
+      for(var i = 0; i < apparel_bottoms.length; i ++){
+        if(idx >= 0 && idx < 3){
+          console.log("[recievedMessage] Bottom: (%s)", apparel_bottoms[i]);
+        }
+      }
+      // check tops
+      idx = ty.indexOf(apparel_bottoms[i]);
+      for(var i = 0; i < apparel_tops.length; i ++){
+        if(idx >= 0 && idx < 3){
+          console.log("[recievedMessage] Tops: (%s)", apparel_tops[i]);
+        }
+      }
+      // check footwear
+      idx = ty.indexOf(apparel_bottoms[i]);
+      for(var i = 0; i < apparel_footwear.length; i ++){
+        if(idx >= 0 && idx < 3){
+          console.log("[recievedMessage] Footwear: (%s)", apparel_footwear[i]);
+        }
+      }
+      sendTextMessage(senderID, 'Nice ' + co[0].w3c.name.toLowerCase() + ' ' +
+         co[1].w3c.name.toLowerCase() + ' '  + co[2].w3c.name.toLowerCase() + ' ' + ty[0].name.toLowerCase() + ' ' + ty[1].name.toLowerCase()
+         + ' ' + ty[2].name.toLowerCase());
+    }));
   }
 
   var messageText = message.text;
