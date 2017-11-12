@@ -10,6 +10,8 @@
 /* jshint node: true, devel: true */
 'use strict';
 
+//import apparel_tops from './apparel_list';
+
 const 
   bodyParser = require('body-parser'),
   config = require('config'),
@@ -299,7 +301,7 @@ function colorDistance(hash1, hash2){
  */
  ;
 function matchItem(item_type, usr_colors){
-
+  console.log(store);
   var TOP = 1;
   var BOTTOM = 2;
   var FOOTWEAR = 3;
@@ -310,9 +312,9 @@ function matchItem(item_type, usr_colors){
   var distances = [];
   // fill color distances
   if(item_type == TOP) {
-    for(var i = 0; i < apparel.apparel_tops.length; i ++){      // i - iterates apparel
+    for(var i = 0; i < store.apparel_tops.length; i ++){      // i - iterates apparel
       for(var j = 0; j < usr_colors.length; j ++){            // j - iterates usr colors
-        for(var k = 0; j < store.apparel_items[apparel.apparel_tops[i]].color.length){
+        for(var k = 0; k < store.apparel_items[apparel.apparel_tops[i]].color.length; k++){
           curDist += colorDistance(usr_colors[j], store.apparel_items[apparel.apparel_tops[i]].color[k]);
           numcomps ++;
         }
@@ -345,6 +347,8 @@ function receivedMessage(event) {
   var timeOfMessage = event.timestamp;
   var message = event.message;
 
+  //shopify.product.get(229020762139).then(res => console.log(JSON.stringify(res)));
+
   console.log("[receivedMessage] user (%d) page (%d) timestamp (%d) and message (%s)", 
     senderID, pageID, timeOfMessage, JSON.stringify(message));
   console.log(message);
@@ -374,44 +378,55 @@ function receivedMessage(event) {
         ty[0].name.toLowerCase() + ' ' +
         ty[1].name.toLowerCase() + ' ' +
         ty[2].name.toLowerCase())));
+
+      sendTextMessage(senderID, 'Alright, let me see what I can find for you.');
     }
-  }
+  } else {
 
-  var messageText = message.text;
-  if (messageText) {
+    var messageText = message.text;
+    if (messageText) {
 
-    var lcm = messageText.toLowerCase().replace(/[.,\/#!?$%\^&\*;:{}=\-_`~()\s']/g,'');
-    console.log(lcm);
-    switch (lcm) {
-      case 'hi':
-      case 'hello':
-      case 'yo':
-      case 'hey':
-      case 'hay':
-      case 'howdy':
-      case 'sup':
-      case 'heyman':
-      case 'howsitgoing':
-      case 'howareyoudoing':
-      case 'whatsup':
-      case 'wassup':
-      case 'whatsgoingon':
-      case 'goodmorning':
-      case 'goodevening':
-      case 'goodafternoon':
-      case 'whazzup':
-      case 'hiya':
-      case 'gday':
-        sendTextMessage(senderID, Greeting.random());
-        break;
-      case 'help':
-        sendTextMessage(senderID, 'Try sending us a picture of a piece of apparel like your favourite pair of pants and we will try and find the perfect match for them!');
-        //sendHelpOptionsAsButtonTemplates(senderID);
-        break;
-      
-      default:
-        // otherwise, just echo it back to the sender
-        sendTextMessage(senderID, messageText);
+      var lcm = messageText.toLowerCase().replace(/[.,\/#!?$%\^&\*;:{}=\-_`~()\s']/g,'');
+      console.log(lcm);
+      switch (lcm) {
+        case 'hi':
+        case 'hello':
+        case 'yo':
+        case 'hey':
+        case 'hay':
+        case 'howdy':
+        case 'sup':
+        case 'heyman':
+        case 'howsitgoing':
+        case 'howareyoudoing':
+        case 'whatsup':
+        case 'wassup':
+        case 'whatsgoingon':
+        case 'goodmorning':
+        case 'goodevening':
+        case 'goodafternoon':
+        case 'whazzup':
+        case 'hiya':
+        case 'gday':
+          sendTextMessage(senderID, Greeting.random());
+          break;
+        case 'help':
+          sendTextMessage(senderID, 'Try sending us a picture of a piece of apparel like your favourite pair of pants and we will try and find the perfect match for them!');
+          //sendHelpOptionsAsButtonTemplates(senderID);
+          break;
+
+        case 'test':
+          sendSimilarProducts(senderID, [ 229020762139,229020762139 ]);
+          break;
+
+        case 'test2':
+          matchItem(1, ['#000000']);
+          break;
+        
+        default:
+          // otherwise, just echo it back to the sender
+          sendTextMessage(senderID, messageText);
+      }
     }
   }
 }
@@ -479,16 +494,6 @@ function respondToHelpRequestWithTemplates(recipientId, requestForHelpOnFeature)
   var templateElements = [];
 
   var requestPayload = JSON.parse(requestForHelpOnFeature);
-
-  var sectionButton = function(title, action, options) {
-    var payload = options | {};
-    payload = Object.assign(options, {action: action});
-    return {
-      type: 'postback',
-      title: title,
-      payload: JSON.stringify(payload)
-    };
-  }
 
   var textButton = function(title, action, options) {
     var payload = options | {};
@@ -565,13 +570,70 @@ function respondToHelpRequestWithTemplates(recipientId, requestForHelpOnFeature)
         };
         callSendAPI(messageData);
       });
-
-
-
       break;
   }
 
 }
+
+var sectionButton = function(title, action, options) {
+    var payload = options | {};
+    payload = Object.assign(options, {action: action});
+    return {
+      type: 'postback',
+      title: title,
+      payload: JSON.stringify(payload)
+    };
+  }
+
+function sendSimilarProducts(recipientId, ids){
+  var templateElements = [];
+  shopify.product.list({ids: '229020762139,229030821915'}).then(
+    (prods, err) => {
+      prods.forEach(product => {
+        console.log(JSON.stringify(product));
+        console.log(product.id);
+        var url = HOST_URL + "/product.html?id="+product.id;
+            templateElements.push({
+              title: product.title,
+              subtitle: product.tags,
+              image_url: product.image.src,
+              buttons:[
+                {
+                  "type":"web_url",
+                  "url": url,
+                  "title":"Read description",
+                  "webview_height_ratio": "compact",
+                  "messenger_extensions": "true"
+                },
+                sectionButton('Get options', 'QR_GET_PRODUCT_OPTIONS', {id: product.id})
+              ]
+            });
+          }
+        )
+        console.log('ASASASASASA' + JSON.stringify(templateElements));
+
+        var messageData = {
+          recipient: {
+            id: recipientId
+          },
+          message: {
+            attachment: {
+              type: "template",
+              payload: {
+                template_type: "generic",
+                elements: templateElements
+              }
+            }
+          }
+        };
+
+        callSendAPI(messageData);
+      }
+    ).catch(err => {
+      console.log(err);
+    });
+
+  }
 
 /*
  * Delivery Confirmation Event
