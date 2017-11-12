@@ -120,7 +120,7 @@ const apparel_items = [{
 "Asana Yoga Set": {
 	"apparel":["jumpsuit","capris","tights","bodysuit","sportsbra","leggings"],
 	"color":["lightgray","darkslategray"],
-	"color_hex",["#698398","#5e7686"],
+	"color_hex":["#698398","#5e7686"],
 	"id":[229031313435]
 },
 
