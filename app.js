@@ -19,6 +19,8 @@ const
   request = require('request'),
   Shopify = require('shopify-api-node');
   Clarifai = require('clarifai');
+  store = require('./store_apparel_tags.js');
+  apparel = require('./apparel_list.js');
 
 var app = express();
 app.set('port', process.env.PORT || 5000);
@@ -254,7 +256,34 @@ function colorDistance(hash1, hash2){
   dist = (rgb1[0] - rgb2[0]) * (rgb1[0] - rgb2[0]) +
          (rgb1[1] - rbg2[1]) * (rgb1[1] - rgb2[1]) +
          (rgb1[2] - rbg2[2]) * (rgb1[2] - rgb2[2]);
+
+  return dist;
 }
+
+/*
+ * Compare Color Dist
+ *
+ * Compares two color distances from indices in the apparel items list
+ *
+ * For use in array.sort(compareFunction)
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+ */
+ function compareDist(a, b){
+  // a, b are [index, distance]
+  if( a[1] > b[1] )
+  {
+    return 1;
+  }
+  else if( a[1] == b[1] )
+  {
+    return 0;
+  }
+  else
+  {
+    return -1;
+  }
+
+ }
 
 /*
  *
@@ -268,15 +297,38 @@ function colorDistance(hash1, hash2){
  * Therefore, we sort by color distance and return the first and last elements
  * of the list.
  */
+ ;
 function matchItem(item_type, usr_colors){
 
   var TOP = 1;
   var BOTTOM = 2;
   var FOOTWEAR = 3;
-  // search through
+  var curDist = 200000;     var lowestIdx = -1;
+  var lowestDist = 200000;  var highestIdx = -1;
+  var highestDist = -1;
+  var numcomps = 0;
+  var distances = [];
+  // fill color distances
   if(item_type == TOP) {
-
+    for(var i = 0; i < apparel.apparel_tops.length; i ++){      // i - iterates apparel
+      for(var j = 0; j < usr_colors.length; j ++){            // j - iterates usr colors
+        for(var k = 0; j < store.apparel_items[apparel.apparel_tops[i]].color.length){
+          curDist += colorDistance(usr_colors[j], store.apparel_items[apparel.apparel_tops[i]].color[k]);
+          numcomps ++;
+        }
+      }
+      console.log("Color distance for (%s) is (%d)", store.apparel_tops[i], curDist/numcompss);
+      distances.push([i, curDist/numcomps]);
+      curDist = 0;
+      numcomps = 0;
+    }
   }
+  // then sort!
+  distances.sort(compareDist);
+
+  console.log(distances);
+
+  return store.apparel_tops[distances[0][0]];
 };
 
 /*
