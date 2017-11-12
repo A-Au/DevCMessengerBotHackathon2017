@@ -338,6 +338,8 @@ function matchItem(item_type, usr_colors){
     distances.sort(compareDist);
 
     console.log(distances);
+    distances.reverse();
+
     console.log(store.apparel_tops[distances[0][0]]);
 
     ret.push( [store.apparel_items[0][store.apparel_tops[distances[2][0]]].id,
@@ -361,6 +363,7 @@ function matchItem(item_type, usr_colors){
     distances.sort(compareDist);
 
     console.log(distances);
+    distances.reverse();
     console.log(store.apparel_bottoms[distances[0][0]]);
 
     ret.push( [store.apparel_items[0][store.apparel_bottoms[distances[2][0]]].id,
