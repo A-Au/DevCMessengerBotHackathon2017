@@ -321,7 +321,7 @@ function matchItem(item_type, usr_colors){
   var distances = [];
   var ret = [];
   // fill color distances
-  if(item_type == TOP || item_type == FOOTWEAR) {
+  if(item_type == BOTTOM || item_type == FOOTWEAR) {
     for(var i = 0; i < store.apparel_tops.length; i ++){      // i - iterates apparel
       for(var j = 0; j < usr_colors.length; j ++){            // j - iterates usr colors
         for(var k = 0; k < store.apparel_items[0][store.apparel_tops[i]].color_hex.length; k++){
@@ -344,7 +344,7 @@ function matchItem(item_type, usr_colors){
             store.apparel_items[0][store.apparel_tops[distances[1][0]]].id,
             store.apparel_items[0][store.apparel_tops[distances[0][0]]].id]);
   }
-  else if(item_type == BOTTOM || item_type == FOOTWEAR){
+  else if(item_type == TOP || item_type == FOOTWEAR){
     for(var i = 0; i < store.apparel_bottoms.length; i ++){      // i - iterates apparel
       for(var j = 0; j < usr_colors.length; j ++){            // j - iterates usr colors
         for(var k = 0; k < store.apparel_items[0][store.apparel_bottoms[i]].color_hex.length; k++){
