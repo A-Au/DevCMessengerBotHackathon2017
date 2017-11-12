@@ -14,7 +14,7 @@
 // 	"Gray": "#87827f",
 // };
 
-const apparel_bottoms = [
+export const apparel_bottoms = [
 	"Amaal Leggings",
 	"Ankle Strap Leggings",
 	"Anna High Performance Tank - Black",
@@ -30,7 +30,7 @@ const apparel_bottoms = [
 	"Priya Leggings"
 ];
 
-const apparel_tops = [
+export const apparel_tops = [
 	"Asana Yoga Set",
 	"Aura Yoga Top",
 	"Coffee Yoga Wine Repeat T-Shirt",
@@ -40,7 +40,7 @@ const apparel_tops = [
 	"RCRP Tank Top",
 ];
 
-const apparel_items = [{
+export const apparel_items = [{
 // Amaal Leggings
 // https://cdn.shopify.com/s/files/1/2463/4523/products/1_ba8e1802-8a49-450c-9333-a2f2b7e4791a_360x.jpg?v=1508425248
 "Amaal Leggings": {
