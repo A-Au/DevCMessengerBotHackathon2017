@@ -14,6 +14,32 @@
 // 	"Gray": "#87827f",
 // };
 
+const apparel_bottoms = [
+	"Amaal Leggings",
+	"Ankle Strap Leggings",
+	"Anna High Performance Tank - Black",
+	"Anna High Performance Tank - Lemon",
+	"3/4 Guggenheim Leggings",
+	"Ambu Leggings",
+	"Anise Leggings",
+	"Anna High Performance Leggings",
+	"Asana Yoga Set",
+	"BIONIC CAPRI",
+	"Eden Running Shorts",
+	"Navy Blue Sports Trousers",
+	"Priya Leggings"
+];
+
+const apparel_tops = [
+	"Asana Yoga Set",
+	"Aura Yoga Top",
+	"Coffee Yoga Wine Repeat T-Shirt",
+	"Elephant Fleece Hoodie",
+	"Pink Propel Funnel Neck Pullover",
+	"RCRP T-Shirt",
+	"RCRP Tank Top",
+];
+
 const apparel_items = [{
 // Amaal Leggings
 // https://cdn.shopify.com/s/files/1/2463/4523/products/1_ba8e1802-8a49-450c-9333-a2f2b7e4791a_360x.jpg?v=1508425248
