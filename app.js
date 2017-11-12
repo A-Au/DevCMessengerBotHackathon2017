@@ -336,10 +336,11 @@ function matchItem(item_type, usr_colors){
   distances.sort(compareDist);
 
   console.log(distances);
+  console.log(store.apparel_tops[distances[0][0]]);
 
-  return {store.apparel_items[store.apparel_tops[distances[0][0]]].id,
-          store.apparel_items[store.apparel_tops[distances[1][0]]].id,
-          store.apparel_items[store.apparel_tops[distances[2][0]]].id};
+  return [store.apparel_items[0][store.apparel_tops[distances[2][0]]].id,
+          store.apparel_items[0][store.apparel_tops[distances[1][0]]].id,
+          store.apparel_items[0][store.apparel_tops[distances[0][0]]].id];
 };
 
 /*
@@ -425,7 +426,8 @@ function receivedMessage(event) {
           break;
 
         case 'test':
-          sendSimilarProducts(senderID, [ 229020762139,229030821915 ]);
+          console.log("asdasdas" + matchItem(1, ['#ffffff']));
+          sendSimilarProducts(senderID, matchItem(1, ['#ffffff']));
           break;
 
         case 'test2':
@@ -630,7 +632,7 @@ function sendSimilarProducts(recipientId, ids){
               type: "template",
               payload: {
                 template_type: "generic",
-                elements: templateElements
+                elements: templateElements.reverse()
               }
             }
           }
