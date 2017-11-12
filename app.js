@@ -248,16 +248,19 @@ function parseColor(hash){
  * Input is understood to be of the format #rrggbb
  */
 function colorDistance(hash1, hash2){
-
+  console.log('hash1 ' + hash1);
+  console.log('hash2 ' + hash2);
   var dist = -1;
   var rgb1 = parseColor(hash1);
   var rgb2 = parseColor(hash2);
+  console.log('hash1 ' + rgb1);
+  console.log('hash2 ' + rgb2);
   var validColors = 0;
 
   // calculate distance
   dist = (rgb1[0] - rgb2[0]) * (rgb1[0] - rgb2[0]) +
-         (rgb1[1] - rbg2[1]) * (rgb1[1] - rgb2[1]) +
-         (rgb1[2] - rbg2[2]) * (rgb1[2] - rgb2[2]);
+         (rgb1[1] - rgb2[1]) * (rgb1[1] - rgb2[1]) +
+         (rgb1[2] - rgb2[2]) * (rgb1[2] - rgb2[2]);
 
   return dist;
 }
@@ -314,12 +317,12 @@ function matchItem(item_type, usr_colors){
   if(item_type == TOP) {
     for(var i = 0; i < store.apparel_tops.length; i ++){      // i - iterates apparel
       for(var j = 0; j < usr_colors.length; j ++){            // j - iterates usr colors
-        for(var k = 0; k < store.apparel_items[apparel.apparel_tops[i]].color.length; k++){
-          curDist += colorDistance(usr_colors[j], store.apparel_items[apparel.apparel_tops[i]].color[k]);
+        for(var k = 0; k < store.apparel_items[0][store.apparel_tops[i]].color_hex.length; k++){
+          curDist += colorDistance(usr_colors[j], store.apparel_items[0][store.apparel_tops[i]].color_hex[k]);
           numcomps ++;
         }
       }
-      console.log("Color distance for (%s) is (%d)", store.apparel_tops[i], curDist/numcompss);
+      console.log("Color distance for (%s) is (%d)", store.apparel_tops[i], curDist);
       distances.push([i, curDist/numcomps]);
       curDist = 0;
       numcomps = 0;

@@ -210,12 +210,12 @@ const apparel_items = [{
 "RCRP Tank Top": {
 	"apparel":["tanktop","haltertop"],
 	"color":["white"],
-	"color_hex":["dfded8"],
+	"color_hex":["#dfded8"],
 	"id":[229001199643]
 }
 
 }];
 
-export { "apparel_tops": apparel_tops, 
+module.exports = { "apparel_tops": apparel_tops, 
 		 "apparel_bottoms": apparel_bottoms, 
 		 "apparel_items": apparel_items };

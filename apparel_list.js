@@ -1,4 +1,4 @@
-export const apparel_list = [	"activeweartshirt",
+const apparel_list = [	"activeweartshirt",
 					"backpack",
 					"belt",
 					"blazer",
@@ -112,7 +112,7 @@ export const apparel_list = [	"activeweartshirt",
 					"wristletclutch"]
 
 
-export const apparel_tops = [
+const apparel_tops = [
 					"activeweartshirt",
 					"blazer",
 					"blouse",
@@ -146,7 +146,7 @@ export const apparel_tops = [
 					"vest",
 					"weddingdress",];
 
-export const apparel_bottoms =[
+const apparel_bottoms =[
 					"bootcutpants",
 					"boyfriendpants",
 					"burmudashorts",
@@ -173,7 +173,7 @@ export const apparel_bottoms =[
 					"womensshortshorts",
 					"womensshorts",];
 
-export const apparel_footwear = [
+const apparel_footwear = [
 					"boatshoes",
 					"flats",
 					"mensboots",
