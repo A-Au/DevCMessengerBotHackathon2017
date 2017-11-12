@@ -337,7 +337,9 @@ function matchItem(item_type, usr_colors){
 
   console.log(distances);
 
-  return store.apparel_tops[distances[0][0]];
+  return {store.apparel_items[store.apparel_tops[distances[0][0]]].id,
+          store.apparel_items[store.apparel_tops[distances[1][0]]].id,
+          store.apparel_items[store.apparel_tops[distances[2][0]]].id};
 };
 
 /*
