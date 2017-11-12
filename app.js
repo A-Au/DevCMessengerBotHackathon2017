@@ -319,8 +319,9 @@ function matchItem(item_type, usr_colors){
   var highestDist = -1;
   var numcomps = 0;
   var distances = [];
+  var ret = [];
   // fill color distances
-  if(item_type == TOP) {
+  if(item_type == TOP || item_type == FOOTWEAR) {
     for(var i = 0; i < store.apparel_tops.length; i ++){      // i - iterates apparel
       for(var j = 0; j < usr_colors.length; j ++){            // j - iterates usr colors
         for(var k = 0; k < store.apparel_items[0][store.apparel_tops[i]].color_hex.length; k++){
@@ -333,16 +334,41 @@ function matchItem(item_type, usr_colors){
       curDist = 0;
       numcomps = 0;
     }
+    // then sort!
+    distances.sort(compareDist);
+
+    console.log(distances);
+    console.log(store.apparel_tops[distances[0][0]]);
+
+    ret.push( [store.apparel_items[0][store.apparel_tops[distances[2][0]]].id,
+            store.apparel_items[0][store.apparel_tops[distances[1][0]]].id,
+            store.apparel_items[0][store.apparel_tops[distances[0][0]]].id]);
   }
-  // then sort!
-  distances.sort(compareDist);
+  else if(item_type == BOTTOM || item_type == FOOTWEAR){
+    for(var i = 0; i < store.apparel_bottoms.length; i ++){      // i - iterates apparel
+      for(var j = 0; j < usr_colors.length; j ++){            // j - iterates usr colors
+        for(var k = 0; k < store.apparel_items[0][store.apparel_bottoms[i]].color_hex.length; k++){
+          curDist += colorDistance(usr_colors[j], store.apparel_items[0][store.apparel_bottoms[i]].color_hex[k]);
+          numcomps ++;
+        }
+      }
+      console.log("Color distance for (%s) is (%d)", store.apparel_bottoms[i], curDist/numcomps);
+      distances.push([i, curDist/numcomps]);
+      curDist = 0;
+      numcomps = 0;
+    }
+    // then sort!
+    distances.sort(compareDist);
 
-  console.log(distances);
-  console.log(store.apparel_tops[distances[0][0]]);
+    console.log(distances);
+    console.log(store.apparel_bottoms[distances[0][0]]);
 
-  return [store.apparel_items[0][store.apparel_tops[distances[2][0]]].id,
-          store.apparel_items[0][store.apparel_tops[distances[1][0]]].id,
-          store.apparel_items[0][store.apparel_tops[distances[0][0]]].id];
+    ret.push( [store.apparel_items[0][store.apparel_bottoms[distances[2][0]]].id,
+            store.apparel_items[0][store.apparel_bottoms[distances[1][0]]].id,
+            store.apparel_items[0][store.apparel_bottoms[distances[0][0]]].id] );
+  }
+
+  return ret;
 };
 
 /*
