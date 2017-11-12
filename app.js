@@ -233,9 +233,13 @@ function parseColor(hash){
 
   var ret = [-1,-1,-1];
 
-  ret[0] = parseInt(hash.charAt(1))*16 + parseInt(hash.charAt(2));
-  ret[1] = parseInt(hash.charAt(3))*16 + parseInt(hash.charAt(4));
-  ret[2] = parseInt(hash.charAt(5))*16 + parseInt(hash.charAt(6));
+  ret[0] = parseInt("0x"+hash.substr(1,2));
+  ret[1] = parseInt("0x"+hash.substr(3,2));
+  ret[2] = parseInt("0x"+hash.substr(5,2));
+  console.log(hash);
+  console.log(hash.substr(1,2));
+  console.log(hash.substr(3,2));
+  console.log(hash.substr(5,2));
 
   return ret;
 }
@@ -322,7 +326,7 @@ function matchItem(item_type, usr_colors){
           numcomps ++;
         }
       }
-      console.log("Color distance for (%s) is (%d)", store.apparel_tops[i], curDist);
+      console.log("Color distance for (%s) is (%d)", store.apparel_tops[i], curDist/numcomps);
       distances.push([i, curDist/numcomps]);
       curDist = 0;
       numcomps = 0;
@@ -419,11 +423,11 @@ function receivedMessage(event) {
           break;
 
         case 'test':
-          sendSimilarProducts(senderID, [ 229020762139,229020762139 ]);
+          sendSimilarProducts(senderID, [ 229020762139,229030821915 ]);
           break;
 
         case 'test2':
-          matchItem(1, ['#000000']);
+          matchItem(1, ['#ffffff']);
           break;
         
         default:
