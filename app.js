@@ -440,7 +440,7 @@ function receivedMessage(event) {
         console.log("Found a " + foundtype);
         sendSimilarProducts(senderID, matchItem(foundtype, [co[0].w3c.hex, co[1].w3c.hex] ));
         console.log('KJDSBFDSKJFBDS4');
-        sendTextMessage(senderID,
+        console.log(
           'Nice ' + co.length + ' ' + ty.length +
           co[0].w3c.hex + ' ' +
           co[1].w3c.hex + ' ' +
