@@ -38,13 +38,13 @@ var app_clarifai = new Clarifai.App({
 function clarifai_predict(url){
   var colour = app_clarifai.models.predict(Clarifai.COLOR_MODEL, url).then(
       (response, error) => {
-        console.log(JSON.stringify(response.outputs[0].data));
+        //console.log(JSON.stringify(response.outputs[0].data));
         return response.outputs[0].data;
       }
     );
   var apparel_type = app_clarifai.models.predict(Clarifai.APPAREL_MODEL, url).then(
         (response, error) => {
-          console.log(JSON.stringify(response.outputs[0].data));
+          //console.log(JSON.stringify(response.outputs[0].data));
           return response.outputs[0].data;
         }
       );
@@ -238,10 +238,10 @@ function parseColor(hash){
   ret[0] = parseInt("0x"+hash.substr(1,2));
   ret[1] = parseInt("0x"+hash.substr(3,2));
   ret[2] = parseInt("0x"+hash.substr(5,2));
-  console.log(hash);
-  console.log(hash.substr(1,2));
-  console.log(hash.substr(3,2));
-  console.log(hash.substr(5,2));
+  //console.log(hash);
+  //console.log(hash.substr(1,2));
+  //console.log(hash.substr(3,2));
+  //console.log(hash.substr(5,2));
 
   return ret;
 }
@@ -254,13 +254,13 @@ function parseColor(hash){
  * Input is understood to be of the format #rrggbb
  */
 function colorDistance(hash1, hash2){
-  console.log('hash1 ' + hash1);
-  console.log('hash2 ' + hash2);
+  //console.log('hash1 ' + hash1);
+  //console.log('hash2 ' + hash2);
   var dist = -1;
   var rgb1 = parseColor(hash1);
   var rgb2 = parseColor(hash2);
-  console.log('hash1 ' + rgb1);
-  console.log('hash2 ' + rgb2);
+  //console.log('hash1 ' + rgb1);
+  //console.log('hash2 ' + rgb2);
   var validColors = 0;
 
   // calculate distance
@@ -387,23 +387,30 @@ function receivedMessage(event) {
         var BOTTOM = 2;
         var FOOTWEAR = 3;
         var hits = [0,0,0];
+        var foundtype = 0;
         var realtype = ty[0].name.toLowerCase().replace(/[.,\/#!?$%\^&\*;:{}=\-_`~()\s']/g,'');
+        console.log('KJDSBFDSKJFBDS');
         for(var i = 0; i < apparel.apparel_tops.length; i ++){
           if(realtype == apparel.apparel_tops[i]){
-            hits[TOP] ++;
+            foundtype = TOP;
           }
         }
+        console.log('KJDSBFDSKJFBDS1');
         for(var i = 0; i < apparel.apparel_bottoms.length; i ++){
           if(realtype == apparel.apparel_bottoms[i]){
-            hits[BOTTOM] ++;
+            foundtype = BOTTOM;
           }
         }
+        console.log('KJDSBFDSKJFBDS2');
         for(var i = 0; i < apparel.apparel_footwear.length; i ++){
           if(realtype == apparel.apparel_footwear[i]){
-            hits[FOOTWEAR] ++;
+            foundtype = FOOTWEAR;
           }
         }
-        console.log("Found a " + hits.sort()[2]);
+        console.log('KJDSBFDSKJFBDS3');
+        console.log("Found a " + foundtype);
+        sendSimilarProducts(senderID, matchItem(foundtype, [co[0].w3c.hex, co[1].w3c.hex] ));
+        console.log('KJDSBFDSKJFBDS4');
         sendTextMessage(senderID,
           'Nice ' + co.length + ' ' + ty.length +
           co[0].w3c.hex + ' ' +
@@ -411,10 +418,10 @@ function receivedMessage(event) {
           //co[2].w3c.name.toLowerCase() + ' ' +
           ty[0].name.toLowerCase() + ' ' +
           ty[1].name.toLowerCase() + ' ' +
-          ty[2].name.toLowerCase()));
-        }
+          ty[2].name.toLowerCase());
+        })
 
-        sendSimilarProducts(senderID, matchItem(1, [co[0].w3c.hex, co[1].w3c.hex] ));
+        //sendSimilarProducts(senderID, matchItem(1, [co[0].w3c.hex, co[1].w3c.hex] ));
       });
 
       sendTextMessage(senderID, 'Alright, let me see what I can find for you.');
@@ -469,6 +476,7 @@ function receivedMessage(event) {
     }
   }
 }
+
 
 /*
  * Send a message with buttons.
@@ -629,8 +637,8 @@ function sendSimilarProducts(recipientId, ids){
   shopify.product.list({ids: ids.join()}).then(
     (prods, err) => {
       prods.forEach(product => {
-        console.log(JSON.stringify(product));
-        console.log(product.id);
+        //console.log(JSON.stringify(product));
+        //console.log(product.id);
         var url = HOST_URL + "/product.html?id="+product.id;
             templateElements.push({
               title: product.title,
@@ -649,7 +657,6 @@ function sendSimilarProducts(recipientId, ids){
             });
           }
         )
-        console.log('ASASASASASA' + JSON.stringify(templateElements));
 
         var messageData = {
           recipient: {
