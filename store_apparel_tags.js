@@ -44,10 +44,8 @@ export const apparel_items = [{
 // Amaal Leggings
 // https://cdn.shopify.com/s/files/1/2463/4523/products/1_ba8e1802-8a49-450c-9333-a2f2b7e4791a_360x.jpg?v=1508425248
 "Amaal Leggings": {
-	"Apparel" : ["Sarong", "Capris"],
-	"Color" : ["DarkSalmon", "DimGray", "LightSlateGray", "PaleVioletRed", "DarkGray"],
-	"Apparel_h" : ["Leggings", "Tights"],
-	"Color_h" : ["Purple"],
+	"Apparel" : ["Sarong", "Capris", "Leggings", "Tights"],
+	"Color" : ["DarkSalmon", "DimGray", "LightSlateGray", "PaleVioletRed", "DarkGray","Purple"],
 	"Color_hex": ["#eb5aa4", "#6a5572"]
 },
 
@@ -56,8 +54,6 @@ export const apparel_items = [{
 "Ankle Strap Leggings" : {
 	"Apparel" : ["Tights", "Capris", "Leggings"],
 	"Color" : ["Black"],
-	"Apparel_h" : [],
-	"Color_h" : [],
 	"Color_hex": ["#261c1c", "#010101"]
 },
 
@@ -66,8 +62,6 @@ export const apparel_items = [{
 "Anna High Performance Tank - Black" : {
 	"Apparel" : ["Tank Top", "Sports Bra", "Bodysuit"],
 	"Color" : ["Black"],
-	"Apparel_h": [],
-	"Color_h": [],
 	"Color_hex": ["#030303"]
 },
 
@@ -75,49 +69,39 @@ export const apparel_items = [{
 // https://cdn.shopify.com/s/files/1/2463/4523/products/1_934ed483-d229-45c9-988d-cb4b84fa0d66_360x.jpg?v=1508425302
 "Anna High Performance Tank - Lemon" : {
 	"Apparel": ["Tank Top", "Sports Bra", "Bodysuit"],
-	"Color": ["PaleGoldenRod"],
-	"Apparel_h": [],
-	"Color_h": ["Lemon"],
+	"Color": ["PaleGoldenRod", "Lemon"],
 	"Color_hex": ["#faf5b3", "#151626"]
 },
 
 // 3/4 Guggenheim Leggnings
 // https://cdn.shopify.com/s/files/1/2463/4523/products/a3c2861cb303ef8ee9f0769f44292958_540x.jpg?v=1508425143
 "3/4 Guggenheim Leggings": {
-	"Apparel": ["Capris", "Tights", "Overalls"],
+	"Apparel": ["Capris", "Tights", "Overalls", "Leggings"],
 	"Color": ["LightSteelBlue", "White", "DarkSlateBlue"],
-	"Apparel_h": ["Leggings"],
-	"Color_h": [],
 	"Color_hex": ["#91a4f0", "#2554a7"]
 },
 
 // Ambu Leggings
 // https://cdn.shopify.com/s/files/1/2463/4523/products/1_b5f36b8a-53ba-44ea-bf6e-0a6b6e86fa83_540x.jpg?v=1508425309
 "Ambu Leggings": {
-	"Apparel": ["Capris", "Bodysuit", "Tights"],
-	"Color": ["DarkSlateGray", "RosyBrown", "Tan"],
-	"Apparel_h": ["Leggings"],
-	"Color_h": ["Pink"],
+	"Apparel": ["Capris", "Bodysuit", "Tights", "Leggings"],
+	"Color": ["DarkSlateGray", "RosyBrown", "Tan", "Pink"],
 	"Color_hex": ["#998e90", "#192c60"]
 },
 
 // Anise Leggings
 // https://cdn.shopify.com/s/files/1/2463/4523/products/1_efc195b5-c2d4-4652-b58a-586ed3334882_540x.jpg?v=1508425311
 "Anise Leggings": {
-	"Apparel": ["Women's Shorts", "Capris", "Sarong"],
-	"Color": ["Black"],
-	"Apparel_h": ["Leggings", "Tights"],
-	"Color_h": ["DarkSlateBlue"],
+	"Apparel": ["Women's Shorts", "Capris", "Sarong", "Leggings", "Tights"],
+	"Color": ["Black", "DarkSlateBlue"],
 	"Color_hex": ["#383f5d", "#94a7ac"]
 },
 
 // Anna High Performance Leggings
 // https://cdn.shopify.com/s/files/1/2463/4523/products/1_65d43591-3f71-4225-a8ac-35083a8874bb_360x.jpg?v=1508425305
 "Anna High Performance Leggings": {
-	"Apparel": ["Capris", "Tights", "Jumpsuit"],
-	"Color": ["PaleGoldenRod", "DimGray"],
-	"Apparel_h": ["Leggings"],
-	"Color_h": ["Black"],
+	"Apparel": ["Capris", "Tights", "Jumpsuit", "Leggings"],
+	"Color": ["PaleGoldenRod", "DimGray", "Black"],
 	"Color_hex": ["#faf5b3", "#151626"]
 },
 
@@ -126,10 +110,8 @@ export const apparel_items = [{
 // Asana Yoga Set
 // https://cdn.shopify.com/s/files/1/2463/4523/products/1_d0a19680-a8fb-459e-9b02-786e30172c9b_900x.jpg?v=1508425316
 "Asana Yoga Set": {
-	"Apparel": ["Jumpsuit", "Capris", "Tights", "Bodysuit", "Sports Bra"],
+	"Apparel": ["Jumpsuit", "Capris", "Tights", "Bodysuit", "Sports Bra", "Leggings"],
 	"Color": ["LightGray", "DarkSlateGray"],
-	"Apparel_h": ["Leggings"],
-	"Color_h": [],
 	"Color_hex", ["#698398", "#5e7686"]
 },
 
@@ -138,18 +120,14 @@ export const apparel_items = [{
 "Aura Yoga Top": {
 	"Apparel": ["Tank Top", "Halter Top", "Tankini"],
 	"Color": ["Black", "LightSteelBlue", "SteelBlue", "DarkSlateBlue", "SlateGray", "DarkSeaGreen"],
-	"Apparel_h": [],
-	"Color_h": [],
 	"Color_hex": ["#aab55c", "#457ac4"]
 },
 
 // BIONIC CAPRI
 // https://cdn.shopify.com/s/files/1/2463/4523/products/04d6b5c9e62a8eba216b96a392f482db_540x.jpg?v=1508425109
 "BIONIC CAPRI": {
-	"Apparel": ["Capris"],
+	"Apparel": ["Capris", "Leggings"],
 	"Color": ["Black"],
-	"Apparel_h": ["Leggings"],
-	"Color_h": [],
 	"Color_hex": ["#48403e", "#1d1e21"]
 },
 
@@ -157,9 +135,7 @@ export const apparel_items = [{
 // https://cdn.shopify.com/s/files/1/2463/4523/products/0b1e259beaaeb99e48ef67f20369771d_360x.jpg?v=1508425068
 "Coffee Yoga Wine Repeat T-Shirt": {
 	"Apparel": ["T-Shirt", "Activewear T Shirt"],
-	"Color": ["Brown"],
-	"Apparel_h": [],
-	"Color_h": ["PaleVioletRed"],
+	"Color": ["Brown", "PaleVioletRed"],
 	"Color_hex": ["#c3303e", "#bc2836"]
 },
 
@@ -168,8 +144,6 @@ export const apparel_items = [{
 "Eden Running Shorts": {
 	"Apparel": ["Women's Shorts", "Women's Board Shorts"],
 	"Color": ["Purple", "PaleVioletRed", "DarkSlateBlue"],
-	"Apparel_h": [],
-	"Color_h": [],
 	"Color_hex": ["#7e46a5", "#cf0067", "#9dd7cf"]
 },
 
@@ -178,18 +152,14 @@ export const apparel_items = [{
 "Elephant Fleece Hoodie": {
 	"Apparel": ["Sweatshirt", "Hoodies", "Sweater"],
 	"Color": ["Gray", "White", "Plum"],
-	"Apparel_h": [],
-	"Color_h": [],
 	"Color_hex": ["#d7d2ca", "#333f47"]
 },
 
 // Navy Blue Sports Trousers
 // https://cdn.shopify.com/s/files/1/2463/4523/products/f6bd875fff774892f53448d129da819a_360x.jpg?v=1508425170
 "Navy Blue Sports Trousers": {
-	"Apparel": ["Wide Leg Pants", "Capris"],
-	"Color": ["Black"],
-	"Apparel_h": ["Sweatpants"],
-	"Color_h": ["DarkSlateBlue"],
+	"Apparel": ["Wide Leg Pants", "Capris", "Sweatpants"],
+	"Color": ["Black", "DarkSlateBlue"],
 	"Color_hex": ["#141522", "#0f101b"]
 },
 
@@ -198,8 +168,6 @@ export const apparel_items = [{
 "Pink Propel Funnel Neck Pullover": {
 	"Apparel": ["Turtleneck", "Sweatshirt", "Hoodies"],
 	"Color": ["Orchid", "Plum"],
-	"Apparel_h": [],
-	"Color_h": [],
 	"Color_hex": ["#ee50c1", "#e448b8"]
 },
 
@@ -208,8 +176,6 @@ export const apparel_items = [{
 "Priya Leggings": {
 	"Apparel": ["Capris", "Leggings", "Tights"],
 	"Color": ["PaleVioletRed"],
-	"Apparel_h": [],
-	"Color_h": [],
 	"Color_hex": ["#c86590", "#33172b"]
 },
 
@@ -218,8 +184,6 @@ export const apparel_items = [{
 "RCRP T-Shirt": {
 	"Apparel": ["T-Shirt", "Activewear T Shirt"],
 	"Color": ["White"],
-	"Apparel_h": [],
-	"Color_h": [],
 	"Color_hex": ["#e0dddf"]
 },
 
@@ -228,8 +192,6 @@ export const apparel_items = [{
 "RCRP Tank Top": {
 	"Apparel": ["Tank Top", "Halter Top"],
 	"Color": ["White"],
-	"Apparel_h": [],
-	"Color_h": [],
 	"Color_hex": ["dfded8"]
 }
 
