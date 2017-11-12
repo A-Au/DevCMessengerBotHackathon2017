@@ -17,8 +17,9 @@ const
   express = require('express'),
   https = require('https'),  
   request = require('request'),
-  Shopify = require('shopify-api-node');
-  Clarifai = require('clarifai');
+  Shopify = require('shopify-api-node'),
+  Clarifai = require('clarifai'),
+  Greeting = require('greeting');
 
 var app = express();
 app.set('port', process.env.PORT || 5000);
@@ -236,44 +237,67 @@ function receivedMessage(event) {
 
   console.log("[receivedMessage] user (%d) page (%d) timestamp (%d) and message (%s)", 
     senderID, pageID, timeOfMessage, JSON.stringify(message));
+  console.log(message);
 
-  var url = message.attachments[0].payload.url;
-  console.log("[receivedMessage] image url: (%s)",
-    url);
-  var prediction = clarifai_predict(url);
-  console.log("djsbf;djksbfsd");
-  console.log(JSON.stringify(prediction));
-  if (message.quick_reply) {
-    console.log("[receivedMessage] quick_reply.payload (%s)", 
-      message.quick_reply.payload);
-    handleQuickReplyResponse(event);
-    return;
-  }
+  if (message.attachments && message.attachments.length >= 1 && message.attachments[0] && message.attachments[0].payload && message.attachments[0].payload.url) {
+    var url = message.attachments[0].payload.url;
+    console.log("[receivedMessage] image url: (%s)", url);
+    var prediction = clarifai_predict(url);
+    console.log(JSON.stringify(prediction));
+    if (message.quick_reply) {
+      console.log("[receivedMessage] quick_reply.payload (%s)", 
+        message.quick_reply.payload);
+      handleQuickReplyResponse(event);
+      return;
+    }
 
-  if (prediction) {
-    const col = prediction.colour.then(res => res.colors);//[0].w3c.name);
-    const type = prediction.apparel_type.then(res => res.concepts);//[0].name);
-    prediction.colour.then(res => console.log("aaaa" + typeof res.colors[0].w3c.name));
-    console.log(typeof type);
-    console.log(type);
-    col.then(co => type.then(ty => sendTextMessage(senderID,
-      'Nice ' + co.length + ' ' + ty.length +
-      co[0].w3c.name.toLowerCase() + ' ' +
-      co[1].w3c.name.toLowerCase() + ' ' +
-      //co[2].w3c.name.toLowerCase() + ' ' +
-      ty[0].name.toLowerCase() + ' ' +
-      ty[1].name.toLowerCase() + ' ' +
-      ty[2].name.toLowerCase())));
+    if (prediction) {
+      const col = prediction.colour.then(res => res.colors);//[0].w3c.name);
+      const type = prediction.apparel_type.then(res => res.concepts);//[0].name);
+      prediction.colour.then(res => console.log("aaaa" + typeof res.colors[0].w3c.name));
+      console.log(typeof type);
+      console.log(type);
+      col.then(co => type.then(ty => sendTextMessage(senderID,
+        'Nice ' + co.length + ' ' + ty.length +
+        co[0].w3c.name.toLowerCase() + ' ' +
+        co[1].w3c.name.toLowerCase() + ' ' +
+        //co[2].w3c.name.toLowerCase() + ' ' +
+        ty[0].name.toLowerCase() + ' ' +
+        ty[1].name.toLowerCase() + ' ' +
+        ty[2].name.toLowerCase())));
+    }
   }
 
   var messageText = message.text;
   if (messageText) {
 
-    var lcm = messageText.toLowerCase();
+    var lcm = messageText.toLowerCase().replace(/[.,\/#!?$%\^&\*;:{}=\-_`~()\s']/g,'');
+    console.log(lcm);
     switch (lcm) {
-      // if the text matches any special keywords, handle them accordingly
+      case 'hi':
+      case 'hello':
+      case 'yo':
+      case 'hey':
+      case 'hay':
+      case 'howdy':
+      case 'sup':
+      case 'heyman':
+      case 'howsitgoing':
+      case 'howareyoudoing':
+      case 'whatsup':
+      case 'wassup':
+      case 'whatsgoingon':
+      case 'goodmorning':
+      case 'goodevening':
+      case 'goodafternoon':
+      case 'whazzup':
+      case 'hiya':
+      case 'gday':
+        sendTextMessage(senderID, Greeting.random());
+        break;
       case 'help':
-        sendHelpOptionsAsButtonTemplates(senderID);
+        sendTextMessage(senderID, 'Try sending us a picture of a piece of apparel like your favourite pair of pants and we will try and find the perfect match for them!');
+        //sendHelpOptionsAsButtonTemplates(senderID);
         break;
       
       default:
