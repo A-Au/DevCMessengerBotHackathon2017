@@ -19,7 +19,8 @@ const
   request = require('request'),
   Shopify = require('shopify-api-node'),
   Clarifai = require('clarifai'),
-  Greeting = require('greeting');
+  store = require('./store_apparel_tags.js'),
+  apparel = require('./apparel_list.js');
 
 var app = express();
 app.set('port', process.env.PORT || 5000);
@@ -222,6 +223,115 @@ app.post('/webhook', function (req, res) {
 });
 
 /*
+ * Parse Color
+ *
+ * Returns an rgb from the form #rrggbb
+ */
+function parseColor(hash){
+
+  var ret = [-1,-1,-1];
+
+  ret[0] = parseInt(hash.charAt(1))*16 + parseInt(hash.charAt(2));
+  ret[1] = parseInt(hash.charAt(3))*16 + parseInt(hash.charAt(4));
+  ret[2] = parseInt(hash.charAt(5))*16 + parseInt(hash.charAt(6));
+
+  return ret;
+}
+
+/*
+ * Color Distance
+ *
+ * Just returns a single value based on squared error between rgb values
+ *
+ * Input is understood to be of the format #rrggbb
+ */
+function colorDistance(hash1, hash2){
+
+  var dist = -1;
+  var rgb1 = parseColor(hash1);
+  var rgb2 = parseColor(hash2);
+  var validColors = 0;
+
+  // calculate distance
+  dist = (rgb1[0] - rgb2[0]) * (rgb1[0] - rgb2[0]) +
+         (rgb1[1] - rbg2[1]) * (rgb1[1] - rgb2[1]) +
+         (rgb1[2] - rbg2[2]) * (rgb1[2] - rgb2[2]);
+
+  return dist;
+}
+
+/*
+ * Compare Color Dist
+ *
+ * Compares two color distances from indices in the apparel items list
+ *
+ * For use in array.sort(compareFunction)
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+ */
+ function compareDist(a, b){
+  // a, b are [index, distance]
+  if( a[1] > b[1] )
+  {
+    return 1;
+  }
+  else if( a[1] == b[1] )
+  {
+    return 0;
+  }
+  else
+  {
+    return -1;
+  }
+
+ }
+
+/*
+ *
+ * Match Item
+ *
+ * This function searches through the store's labelled json object to find
+ * any items that might match based on the colors
+ *
+ * We want to give back an item with high contrast and an item with low contrast.
+ *
+ * Therefore, we sort by color distance and return the first and last elements
+ * of the list.
+ */
+ ;
+function matchItem(item_type, usr_colors){
+
+  var TOP = 1;
+  var BOTTOM = 2;
+  var FOOTWEAR = 3;
+  var curDist = 200000;     var lowestIdx = -1;
+  var lowestDist = 200000;  var highestIdx = -1;
+  var highestDist = -1;
+  var numcomps = 0;
+  var distances = [];
+  // fill color distances
+  if(item_type == TOP) {
+    for(var i = 0; i < apparel.apparel_tops.length; i ++){      // i - iterates apparel
+      for(var j = 0; j < usr_colors.length; j ++){            // j - iterates usr colors
+        for(var k = 0; j < store.apparel_items[apparel.apparel_tops[i]].color.length){
+          curDist += colorDistance(usr_colors[j], store.apparel_items[apparel.apparel_tops[i]].color[k]);
+          numcomps ++;
+        }
+      }
+      console.log("Color distance for (%s) is (%d)", store.apparel_tops[i], curDist/numcompss);
+      distances.push([i, curDist/numcomps]);
+      curDist = 0;
+      numcomps = 0;
+    }
+  }
+  // then sort!
+  distances.sort(compareDist);
+
+  console.log(distances);
+
+  return store.apparel_tops[distances[0][0]];
+};
+
+/*
  * Message Event
  *
  * This event is called when a message is sent to your page. The 'message' 
@@ -250,7 +360,6 @@ function receivedMessage(event) {
       handleQuickReplyResponse(event);
       return;
     }
-
     if (prediction) {
       const col = prediction.colour.then(res => res.colors);//[0].w3c.name);
       const type = prediction.apparel_type.then(res => res.concepts);//[0].name);
