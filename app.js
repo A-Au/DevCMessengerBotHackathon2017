@@ -221,6 +221,65 @@ app.post('/webhook', function (req, res) {
 });
 
 /*
+ * Parse Color
+ *
+ * Returns an rgb from the form #rrggbb
+ */
+function parseColor(hash){
+
+  var ret = [-1,-1,-1];
+
+  ret[0] = parseInt(hash.charAt(1))*16 + parseInt(hash.charAt(2));
+  ret[1] = parseInt(hash.charAt(3))*16 + parseInt(hash.charAt(4));
+  ret[2] = parseInt(hash.charAt(5))*16 + parseInt(hash.charAt(6));
+
+  return ret;
+}
+
+/*
+ * Color Distance
+ *
+ * Just returns a single value based on squared error between rgb values
+ *
+ * Input is understood to be of the format #rrggbb
+ */
+function colorDistance(hash1, hash2){
+
+  var dist = -1;
+  var rgb1 = parseColor(hash1);
+  var rgb2 = parseColor(hash2);
+  var validColors = 0;
+
+  // calculate distance
+  dist = (rgb1[0] - rgb2[0]) * (rgb1[0] - rgb2[0]) +
+         (rgb1[1] - rbg2[1]) * (rgb1[1] - rgb2[1]) +
+         (rgb1[2] - rbg2[2]) * (rgb1[2] - rgb2[2]);
+}
+
+/*
+ *
+ * Match Item
+ *
+ * This function searches through the store's labelled json object to find
+ * any items that might match based on the colors
+ *
+ * We want to give back an item with high contrast and an item with low contrast.
+ *
+ * Therefore, we sort by color distance and return the first and last elements
+ * of the list.
+ */
+function matchItem(item_type, usr_colors){
+
+  var TOP = 1;
+  var BOTTOM = 2;
+  var FOOTWEAR = 3;
+  // search through
+  if(item_type == TOP) {
+
+  }
+};
+
+/*
  * Message Event
  *
  * This event is called when a message is sent to your page. The 'message' 
