@@ -1,14 +1,18 @@
-const apparel_type_tops = ["Tank Top", "Sports Bra", "Bodysuit",
-							"Turtleneck", "Sweatshirt", "Hoodies",
-							"T-Shirt", "Activewear T Shirt",
-							"Halter Top", "Sweater"];
-const apparel_type_bottoms = ["Sarong", "Capris", "Tights", "Leggings",
-								"Wide Leg Pants", "Sweatpants"];
+// const apparel_type_tops = ["Tank Top", "Sports Bra", "Bodysuit",
+// 							"Turtleneck", "Sweatshirt", "Hoodies",
+// 							"T-Shirt", "Activewear T Shirt",
+// 							"Halter Top", "Sweater",
+// 							"Peacoat"];
+// const apparel_type_bottoms = ["Sarong", "Capris", "Tights", "Leggings",
+// 								"Wide Leg Pants", "Sweatpants"];
 
-const color_coded = {
-	"Plum": "#be79a6",
-	"Gray": "#87827f",
-};
+// const apparel_type_footwear = ["Sneakers", "Oxfords", "Men's Sandals", "Men's Boots",
+// 								"Women's Boots"]
+
+// const color_coded = {
+// 	"Plum": "#be79a6",
+// 	"Gray": "#87827f",
+// };
 
 const apparel_items = [{
 // Amaal Leggings
