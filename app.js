@@ -382,14 +382,37 @@ function receivedMessage(event) {
       prediction.colour.then(res => console.log("aaaa" + typeof res.colors[0].w3c.name));
       console.log(typeof type);
       console.log(type);
-      col.then(co => {type.then(ty => sendTextMessage(senderID,
-        'Nice ' + co.length + ' ' + ty.length +
-        co[0].w3c.hex + ' ' +
-        co[1].w3c.hex + ' ' +
-        //co[2].w3c.name.toLowerCase() + ' ' +
-        ty[0].name.toLowerCase() + ' ' +
-        ty[1].name.toLowerCase() + ' ' +
-        ty[2].name.toLowerCase()))
+      col.then(co => {type.then(ty => {
+        var TOP = 1;
+        var BOTTOM = 2;
+        var FOOTWEAR = 3;
+        var hits = [0,0,0];
+        var realtype = ty[0].name.toLowerCase().replace(/[.,\/#!?$%\^&\*;:{}=\-_`~()\s']/g,'');
+        for(var i = 0; i < apparel.apparel_tops.length; i ++){
+          if(realtype == apparel.apparel_tops[i]){
+            hits[TOP] ++;
+          }
+        }
+        for(var i = 0; i < apparel.apparel_bottoms.length; i ++){
+          if(realtype == apparel.apparel_bottoms[i]){
+            hits[BOTTOM] ++;
+          }
+        }
+        for(var i = 0; i < apparel.apparel_footwear.length; i ++){
+          if(realtype == apparel.apparel_footwear[i]){
+            hits[FOOTWEAR] ++;
+          }
+        }
+        console.log("Found a " + hits.sort()[2]);
+        sendTextMessage(senderID,
+          'Nice ' + co.length + ' ' + ty.length +
+          co[0].w3c.hex + ' ' +
+          co[1].w3c.hex + ' ' +
+          //co[2].w3c.name.toLowerCase() + ' ' +
+          ty[0].name.toLowerCase() + ' ' +
+          ty[1].name.toLowerCase() + ' ' +
+          ty[2].name.toLowerCase()));
+        }
 
         sendSimilarProducts(senderID, matchItem(1, [co[0].w3c.hex, co[1].w3c.hex] ));
       });
