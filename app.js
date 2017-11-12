@@ -605,13 +605,7 @@ function respondToHelpRequestWithTemplates(recipientId, requestForHelpOnFeature)
             id: recipientId
           },
           message: {
-            attachment: {
-              type: "template",
-              payload: {
-                template_type: "generic",
-                elements: templateElements
-              }
-            }
+            text: 'Hi, send us a picture and we\'ll find you a perfect match for what you\'ve got'
           }
         };
 
@@ -633,10 +627,7 @@ function respondToHelpRequestWithTemplates(recipientId, requestForHelpOnFeature)
             id: recipientId
           },
           message: {
-            text: options.substring(0, 640),
-            quick_replies: [
-              textButton('Get 3 products', 'QR_GET_PRODUCT_LIST', {limit: 3})
-            ]
+            text: 'Hi, send us a picture and we\'ll find you a perfect match for what you\'ve got'
           },
         };
         callSendAPI(messageData);
