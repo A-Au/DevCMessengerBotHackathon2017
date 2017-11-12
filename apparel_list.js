@@ -183,3 +183,7 @@ const apparel_footwear = [
 					"womensboots",
 					"womenssandals",
 ];
+
+module.exports = { "apparel_tops": apparel_tops, 
+		 "apparel_bottoms": apparel_bottoms, 
+		 "apparel_footwear": apparel_footwear };
