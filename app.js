@@ -418,30 +418,25 @@ function receivedMessage(event) {
         var hits = [0,0,0];
         var foundtype = 0;
         var realtype = ty[0].name.toLowerCase().replace(/[.,\/#!?$%\^&\*;:{}=\-_`~()\s']/g,'');
-        console.log('KJDSBFDSKJFBDS');
         for(var i = 0; i < apparel.apparel_tops.length; i ++){
           if(realtype == apparel.apparel_tops[i]){
             foundtype = TOP;
           }
         }
-        console.log('KJDSBFDSKJFBDS1');
         for(var i = 0; i < apparel.apparel_bottoms.length; i ++){
           if(realtype == apparel.apparel_bottoms[i]){
             foundtype = BOTTOM;
           }
         }
-        console.log('KJDSBFDSKJFBDS2');
         for(var i = 0; i < apparel.apparel_footwear.length; i ++){
           if(realtype == apparel.apparel_footwear[i]){
             foundtype = FOOTWEAR;
           }
         }
-        console.log('KJDSBFDSKJFBDS3');
         console.log("Found a " + foundtype);
         sendSimilarProducts(senderID, matchItem(foundtype, [co[0].w3c.hex, co[1].w3c.hex] ));
-        console.log('KJDSBFDSKJFBDS4');
         console.log(
-          'Nice ' + co.length + ' ' + ty.length +
+          ' ' + co.length + ' ' + ty.length +
           co[0].w3c.hex + ' ' +
           co[1].w3c.hex + ' ' +
           //co[2].w3c.name.toLowerCase() + ' ' +
