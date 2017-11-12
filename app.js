@@ -38,6 +38,7 @@ var app_clarifai = new Clarifai.App({
 function clarifai_predict(url){
   var colour = app_clarifai.models.predict(Clarifai.COLOR_MODEL, url).then(
       (response, error) => {
+        console.log(JSON.stringify(response.outputs[0].data));
         return response.outputs[0].data;
       }
     );
@@ -381,14 +382,17 @@ function receivedMessage(event) {
       prediction.colour.then(res => console.log("aaaa" + typeof res.colors[0].w3c.name));
       console.log(typeof type);
       console.log(type);
-      col.then(co => type.then(ty => sendTextMessage(senderID,
+      col.then(co => {type.then(ty => sendTextMessage(senderID,
         'Nice ' + co.length + ' ' + ty.length +
-        co[0].w3c.name.toLowerCase() + ' ' +
-        co[1].w3c.name.toLowerCase() + ' ' +
+        co[0].w3c.hex + ' ' +
+        co[1].w3c.hex + ' ' +
         //co[2].w3c.name.toLowerCase() + ' ' +
         ty[0].name.toLowerCase() + ' ' +
         ty[1].name.toLowerCase() + ' ' +
-        ty[2].name.toLowerCase())));
+        ty[2].name.toLowerCase()))
+
+        sendSimilarProducts(senderID, matchItem(1, [co[0].w3c.hex, co[1].w3c.hex] ));
+      });
 
       sendTextMessage(senderID, 'Alright, let me see what I can find for you.');
     }
