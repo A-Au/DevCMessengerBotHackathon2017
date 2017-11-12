@@ -17,8 +17,6 @@
 const apparel_bottoms = [
 	"Amaal Leggings",
 	"Ankle Strap Leggings",
-	"Anna High Performance Tank - Black",
-	"Anna High Performance Tank - Lemon",
 	"3/4 Guggenheim Leggings",
 	"Ambu Leggings",
 	"Anise Leggings",
@@ -31,6 +29,8 @@ const apparel_bottoms = [
 ];
 
 const apparel_tops = [
+	"Anna High Performance Tank - Black",
+	"Anna High Performance Tank - Lemon",
 	"Asana Yoga Set",
 	"Aura Yoga Top",
 	"Coffee Yoga Wine Repeat T-Shirt",
