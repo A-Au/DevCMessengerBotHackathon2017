@@ -587,7 +587,7 @@ var sectionButton = function(title, action, options) {
 
 function sendSimilarProducts(recipientId, ids){
   var templateElements = [];
-  shopify.product.list({ids: '229020762139,229030821915'}).then(
+  shopify.product.list({ids: ids.join()}).then(
     (prods, err) => {
       prods.forEach(product => {
         console.log(JSON.stringify(product));
