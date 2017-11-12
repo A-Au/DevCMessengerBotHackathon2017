@@ -22,6 +22,7 @@ const
   Shopify = require('shopify-api-node'),
   Clarifai = require('clarifai'),
   store = require('./store_apparel_tags.js'),
+  Greeting = require('greeting'),
   apparel = require('./apparel_list.js');
 
 var app = express();
