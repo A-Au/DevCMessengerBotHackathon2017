@@ -36,13 +36,13 @@ app.use(bodyParser.json({ verify: verifyRequestSignature }));
 app.use(express.static('public'));
 
 function clarifai_predict(url){
-  var colour = appClarifai.models.predict(Clarifai.COLOR_MODEL, url).then(
+  const colour = appClarifai.models.predict(Clarifai.COLOR_MODEL, url).then(
       (response, error) => {
         //console.log(JSON.stringify(response.outputs[0].data));
         return response.outputs[0].data;
       }
     );
-  var apparel_type = appClarifai.models.predict(Clarifai.APPAREL_MODEL, url).then(
+  const apparel_type = appClarifai.models.predict(Clarifai.APPAREL_MODEL, url).then(
         (response, error) => {
           //console.log(JSON.stringify(response.outputs[0].data));
           return response.outputs[0].data;
@@ -58,7 +58,7 @@ function clarifai_predict(url){
 
 /*
  * Open config/default.json and set your config values before running this code. 
- * You can also set them using environment variables.
+ * You can also set them using environment constiables.
  *
  */
 
@@ -107,6 +107,34 @@ const shopify = new Shopify({
 
 
 /*
+ * Call the Send API. The message data goes in the body. If successful, we'll
+ * get the message id in a response
+ *
+ */
+function callSendAPI(messageData) {
+  request({
+    uri: 'https://graph.facebook.com/v2.6/me/messages',
+    qs: { access_token: FB_PAGE_ACCESS_TOKEN },
+    method: 'POST',
+    json: messageData,
+  }, (error, response, body) => {
+    if (!error && response.statusCode === 200) {
+      const recipientId = body.recipient_id;
+      const messageId = body.message_id;
+
+      if (messageId) {
+        console.log('[callSendAPI] Successfully sent message with id %s to recipient %s', messageId, recipientId);
+      } else {
+        console.log('[callSendAPI] Successfully called Send API for recipient %s', recipientId);
+      }
+    } else {
+      console.error('[callSendAPI] Send API call failed', response.statusCode, response.statusMessage, body.error);
+    }
+  });
+}
+
+
+/*
  * Verify that the callback came from Facebook. Using the App Secret from 
  * your App Dashboard, we can verify the signature that is sent with each 
  * callback in the x-hub-signature field, located in the header.
@@ -115,17 +143,17 @@ const shopify = new Shopify({
  *
  */
 function verifyRequestSignature(req, res, buf) {
-  var signature = req.headers['x-hub-signature'];
+  const signature = req.headers['x-hub-signature'];
 
   if (!signature) {
     // In DEV, log an error. In PROD, throw an error.
     console.error('Couldn\'t validate the signature.');
   } else {
-    var elements = signature.split('=');
-    var method = elements[0];
-    var signatureHash = elements[1];
+    const elements = signature.split('=');
+    const method = elements[0];
+    const signatureHash = elements[1];
 
-    var expectedHash = crypto.createHmac('sha1', FB_APP_SECRET)
+    const expectedHash = crypto.createHmac('sha1', FB_APP_SECRET)
                         .update(buf)
                         .digest('hex');
 
@@ -158,11 +186,11 @@ app.get('/webhook', function(req, res) {
  * serves a static page for the webview
  */ 
 app.get('/product_description', function(req, res) {
-  var product_id = req.query['id'];
+  const product_id = req.query['id'];
   if (product_id !== 'null') {
     console.log('[app.get] product id:' + product_id);
-    var sh_product = shopify.product.get(product_id);
-    sh_product.then(function(product) {
+    const shProduct = shopify.product.get(product_id);
+    shProduct.then(function(product) {
       console.log(product.options[0].values);
       res.status(200).send(product.body_html);
     }, function(error) {
@@ -189,20 +217,20 @@ app.post('/webhook', function (req, res) {
   // you're paused on a breakpoint! Otherwise, the request might time out. 
   res.sendStatus(200);
         
-  var data = req.body;
+  const data = req.body;
 
   // Make sure this is a page subscription
   if (data.object == 'page') {
     // entries may be batched so iterate over each one
     data.entry.forEach(function(pageEntry) {
-      var pageID = pageEntry.id;
-      var timeOfEvent = pageEntry.time;
+      const pageID = pageEntry.id;
+      const timeOfEvent = pageEntry.time;
 
       // iterate over each messaging event
       pageEntry.messaging.forEach(function(messagingEvent) {
 
         let propertyNames = [];
-        for (var prop in messagingEvent) { propertyNames.push(prop)}
+        for (const prop in messagingEvent) { propertyNames.push(prop)}
         console.log('[app.post] Webhook received a messagingEvent with properties: ', propertyNames.join());
         
         if (messagingEvent.message) {
@@ -233,7 +261,7 @@ app.post('/webhook', function (req, res) {
  */
 function parseColor(hash){
 
-  var ret = [-1,-1,-1];
+  const ret = [-1,-1,-1];
 
   ret[0] = parseInt('0x'+hash.substr(1,2));
   ret[1] = parseInt('0x'+hash.substr(3,2));
@@ -256,12 +284,12 @@ function parseColor(hash){
 function colorDistance(hash1, hash2){
   //console.log('hash1 ' + hash1);
   //console.log('hash2 ' + hash2);
-  var dist = -1;
-  var rgb1 = parseColor(hash1);
-  var rgb2 = parseColor(hash2);
+  const dist = -1;
+  const rgb1 = parseColor(hash1);
+  const rgb2 = parseColor(hash2);
   //console.log('hash1 ' + rgb1);
   //console.log('hash2 ' + rgb2);
-  var validColors = 0;
+  const validColors = 0;
 
   // calculate distance
   dist = (rgb1[0] - rgb2[0]) * (rgb1[0] - rgb2[0]) +
@@ -311,20 +339,20 @@ function colorDistance(hash1, hash2){
  ;
 function matchItem(item_type, usr_colors){
   console.log(store);
-  var TOP = 1;
-  var BOTTOM = 2;
-  var FOOTWEAR = 3;
-  var curDist = 200000;     var lowestIdx = -1;
-  var lowestDist = 200000;  var highestIdx = -1;
-  var highestDist = -1;
-  var numcomps = 0;
-  var distances = [];
-  var ret = [];
+  const TOP = 1;
+  const BOTTOM = 2;
+  const FOOTWEAR = 3;
+  const curDist = 200000;     const lowestIdx = -1;
+  const lowestDist = 200000;  const highestIdx = -1;
+  const highestDist = -1;
+  const numcomps = 0;
+  const distances = [];
+  const ret = [];
   // fill color distances
   if(item_type == BOTTOM || item_type == FOOTWEAR) {
-    for(var i = 0; i < store.apparel_tops.length; i ++){      // i - iterates apparel
-      for(var j = 0; j < usr_colors.length; j ++){            // j - iterates usr colors
-        for(var k = 0; k < store.apparel_items[0][store.apparel_tops[i]].color_hex.length; k++){
+    for(const i = 0; i < store.apparel_tops.length; i ++){      // i - iterates apparel
+      for(const j = 0; j < usr_colors.length; j ++){            // j - iterates usr colors
+        for(const k = 0; k < store.apparel_items[0][store.apparel_tops[i]].color_hex.length; k++){
           curDist += colorDistance(usr_colors[j], store.apparel_items[0][store.apparel_tops[i]].color_hex[k]);
           numcomps ++;
         }
@@ -347,9 +375,9 @@ function matchItem(item_type, usr_colors){
             store.apparel_items[0][store.apparel_tops[distances[0][0]]].id]);
   }
   if(item_type == TOP || item_type == FOOTWEAR){
-    for(var i = 0; i < store.apparel_bottoms.length; i ++){      // i - iterates apparel
-      for(var j = 0; j < usr_colors.length; j ++){            // j - iterates usr colors
-        for(var k = 0; k < store.apparel_items[0][store.apparel_bottoms[i]].color_hex.length; k++){
+    for(const i = 0; i < store.apparel_bottoms.length; i ++){      // i - iterates apparel
+      for(const j = 0; j < usr_colors.length; j ++){            // j - iterates usr colors
+        for(const k = 0; k < store.apparel_items[0][store.apparel_bottoms[i]].color_hex.length; k++){
           curDist += colorDistance(usr_colors[j], store.apparel_items[0][store.apparel_bottoms[i]].color_hex[k]);
           numcomps ++;
         }
@@ -378,15 +406,15 @@ function matchItem(item_type, usr_colors){
  * Message Event
  *
  * This event is called when a message is sent to your page. The 'message' 
- * object format can vary depending on the kind of message that was received.
+ * object format can consty depending on the kind of message that was received.
  * Read more at https://developers.facebook.com/docs/messenger-platform/webhook-reference/message-received
  * 
  */
 function receivedMessage(event) {
-  var senderID = event.sender.id;
-  var pageID = event.recipient.id;
-  var timeOfMessage = event.timestamp;
-  var message = event.message;
+  const senderID = event.sender.id;
+  const pageID = event.recipient.id;
+  const timeOfMessage = event.timestamp;
+  const message = event.message;
 
   //shopify.product.get(229020762139).then(res => console.log(JSON.stringify(res)));
 
@@ -395,9 +423,9 @@ function receivedMessage(event) {
   console.log(message);
 
   if (message.attachments && message.attachments.length >= 1 && message.attachments[0] && message.attachments[0].payload && message.attachments[0].payload.url) {
-    var url = message.attachments[0].payload.url;
+    const url = message.attachments[0].payload.url;
     console.log('[receivedMessage] image url: (%s)', url);
-    var prediction = clarifai_predict(url);
+    const prediction = clarifai_predict(url);
     console.log(JSON.stringify(prediction));
     if (message.quick_reply) {
       console.log('[receivedMessage] quick_reply.payload (%s)', 
@@ -412,23 +440,23 @@ function receivedMessage(event) {
       console.log(typeof type);
       console.log(type);
       col.then(co => {type.then(ty => {
-        var TOP = 1;
-        var BOTTOM = 2;
-        var FOOTWEAR = 3;
-        var hits = [0,0,0];
-        var foundtype = 0;
-        var realtype = ty[0].name.toLowerCase().replace(/[.,\/#!?$%\^&\*;:{}=\-_`~()\s']/g,'');
-        for(var i = 0; i < apparel.apparel_tops.length; i ++){
+        const TOP = 1;
+        const BOTTOM = 2;
+        const FOOTWEAR = 3;
+        const hits = [0,0,0];
+        const foundtype = 0;
+        const realtype = ty[0].name.toLowerCase().replace(/[.,\/#!?$%\^&\*;:{}=\-_`~()\s']/g,'');
+        for(const i = 0; i < apparel.apparel_tops.length; i ++){
           if(realtype == apparel.apparel_tops[i]){
             foundtype = TOP;
           }
         }
-        for(var i = 0; i < apparel.apparel_bottoms.length; i ++){
+        for(const i = 0; i < apparel.apparel_bottoms.length; i ++){
           if(realtype == apparel.apparel_bottoms[i]){
             foundtype = BOTTOM;
           }
         }
-        for(var i = 0; i < apparel.apparel_footwear.length; i ++){
+        for(const i = 0; i < apparel.apparel_footwear.length; i ++){
           if(realtype == apparel.apparel_footwear[i]){
             foundtype = FOOTWEAR;
           }
@@ -452,10 +480,10 @@ function receivedMessage(event) {
     }
   } else {
 
-    var messageText = message.text;
+    const messageText = message.text;
     if (messageText) {
 
-      var lcm = messageText.toLowerCase().replace(/[.,\/#!?$%\^&\*;:{}=\-_`~()\s']/g,'');
+      const lcm = messageText.toLowerCase().replace(/[.,\/#!?$%\^&\*;:{}=\-_`~()\s']/g,'');
       console.log(lcm);
       switch (lcm) {
         case 'hi':
@@ -508,7 +536,7 @@ function receivedMessage(event) {
  */
 function sendHelpOptionsAsButtonTemplates(recipientId) {
   console.log('[sendHelpOptionsAsButtonTemplates] Sending the help options menu'); 
-  var messageData = {
+  const messageData = {
     recipient: {
       id: recipientId
     },
@@ -540,181 +568,165 @@ function sendHelpOptionsAsButtonTemplates(recipientId) {
  *
  */
 function handleQuickReplyResponse(event) {
-  var senderID = event.sender.id;
-  var pageID = event.recipient.id;
-  var message = event.message;
-  var quickReplyPayload = message.quick_reply.payload;
+  const senderID = event.sender.id;
+  const pageID = event.recipient.id;
+  const message = event.message;
+  const quickReplyPayload = message.quick_reply.payload;
   
   console.log('[handleQuickReplyResponse] Handling quick reply response (%s) from sender (%d) to page (%d) with message (%s)', 
     quickReplyPayload, senderID, pageID, JSON.stringify(message));
   
-  // use branched conversation with one interaction per feature (each of which contains a variable number of content pieces)
+  // use branched conversation with one interaction per feature (each of which contains a constiable number of content pieces)
   respondToHelpRequestWithTemplates(senderID, quickReplyPayload);
-  
 }
+
+const sectionButton = (title, action, options) => {
+  // const payload = options | {};
+  const payload = Object.assign(options, { action });
+  return {
+    type: 'postback',
+    title,
+    payload: JSON.stringify(payload),
+  };
+};
 
 /*
  * This response uses templateElements to present the user with a carousel
- * You send ALL of the content for the selected feature and they can 
+ * You send ALL of the content for the selected feature and they can
  * swipe from side to side to see it
  *
  */
 function respondToHelpRequestWithTemplates(recipientId, requestForHelpOnFeature) {
-  console.log('[respondToHelpRequestWithTemplates] handling help request for %s',
-    requestForHelpOnFeature);
-  var templateElements = [];
+  console.log('[respondToHelpRequestWithTemplates] handling help request for %s', requestForHelpOnFeature);
+  const templateElements = [];
 
-  var requestPayload = JSON.parse(requestForHelpOnFeature);
+  const requestPayload = JSON.parse(requestForHelpOnFeature);
 
-  var textButton = function(title, action, options) {
-    var payload = options | {};
-    payload = Object.assign(options, {action: action});
+  /* const textButton = (title, action, options) => {
+    const payload = Object.assign(options, { action });
     return {
-      'content_type':'text',
-      title: title,
-      payload: JSON.stringify(payload)
+      content_type: 'text',
+      title,
+      payload: JSON.stringify(payload),
     };
-  }
+  }; */
 
   switch (requestPayload.action) {
-    case 'QR_GET_PRODUCT_LIST':
-      var products = shopify.product.list({ limit: requestPayload.limit});
-      products.then(function(listOfProducs) {
-        listOfProducs.forEach(function(product) {
-          var url = HOST_URL + '/product.html?id='+product.id;
+    case 'QR_GET_PRODUCT_LIST': {
+      const products = shopify.product.list({ limit: requestPayload.limit });
+      products.then((listOfProducs) => {
+        listOfProducs.forEach((product) => {
+          const url = `${HOST_URL}/product.html?id=${product.id}`;
           templateElements.push({
             title: product.title,
             subtitle: product.tags,
             image_url: product.image.src,
-            buttons:[
+            buttons: [
               {
-                'type':'web_url',
-                'url': url,
-                'title':'Read description',
-                'webview_height_ratio': 'compact',
-                'messenger_extensions': 'true'
+                type: 'web_url',
+                url,
+                title: 'Read description',
+                webview_height_ratio: 'compact',
+                messenger_extensions: 'true',
               },
-              sectionButton('Get options', 'QR_GET_PRODUCT_OPTIONS', {id: product.id})
-            ]
+              sectionButton('Get options', 'QR_GET_PRODUCT_OPTIONS', { id: product.id }),
+            ],
           });
         });
 
-        
-        var messageData = {
+        const messageData = {
           recipient: {
-            id: recipientId
+            id: recipientId,
           },
           message: {
-            text: 'Hi, send us a picture and we\'ll find you a perfect match for what you\'ve got'
-          }
+            text: 'Hi, send us a picture and we\'ll find you a perfect match for what you\'ve got',
+          },
         };
 
         callSendAPI(messageData);
-
       });
-
       break;
+    }
 
-    case 'QR_GET_PRODUCT_OPTIONS':
-      var sh_product = shopify.product.get(requestPayload.id);
-      sh_product.then(function(product) {
-        var options = '';
-        product.options.map(function(option) {
-          options = options + option.name + ': ' + option.values.join(',') + '\n';
-        });
-        var messageData = {
+    case 'QR_GET_PRODUCT_OPTIONS': {
+      const shProduct = shopify.product.get(requestPayload.id);
+      shProduct.then((product) => {
+        const options = product.options.map(option => `${options}${option.name}': '${option.values.join(',')}'\n'`);
+        const messageData = {
           recipient: {
-            id: recipientId
+            id: recipientId,
           },
           message: {
-            text: 'Hi, send us a picture and we\'ll find you a perfect match for what you\'ve got'
+            text: 'Hi, send us a picture and we\'ll find you a perfect match for what you\'ve got',
           },
         };
         callSendAPI(messageData);
       });
       break;
+    }
+    default:
   }
-
 }
 
-var sectionButton = function(title, action, options) {
-    var payload = options | {};
-    payload = Object.assign(options, {action: action});
-    return {
-      type: 'postback',
-      title: title,
-      payload: JSON.stringify(payload)
-    };
-  }
-
-function sendSimilarProducts(recipientId, ids){
-  var templateElements = [];
-  shopify.product.list({ids: ids.join()}).then(
-    (prods, err) => {
-      prods.forEach(product => {
-        //console.log(JSON.stringify(product));
-        //console.log(product.id);
-        var url = HOST_URL + '/product.html?id='+product.id;
-            templateElements.push({
-              title: product.title,
-              subtitle: product.tags,
-              image_url: product.image.src,
-              buttons:[
-                {
-                  'type':'web_url',
-                  'url': url,
-                  'title':'Read description',
-                  'webview_height_ratio': 'compact',
-                  'messenger_extensions': 'true'
-                },
-                sectionButton('Get options', 'QR_GET_PRODUCT_OPTIONS', {id: product.id})
-              ]
-            });
-          }
-        )
-
-        var messageData = {
-          recipient: {
-            id: recipientId
+function sendSimilarProducts(recipientId, ids) {
+  const templateElements = [];
+  shopify.product.list({ ids: ids.join() }).then((prods) => {
+    prods.forEach((product) => {
+      const url = `${HOST_URL}/product.html?id=${product.id}`;
+      templateElements.push({
+        title: product.title,
+        subtitle: product.tags,
+        image_url: product.image.src,
+        buttons: [
+          {
+            type: 'web_url',
+            url,
+            title: 'Read description',
+            webview_height_ratio: 'compact',
+            messenger_extensions: 'true',
           },
-          message: {
-            attachment: {
-              type: 'template',
-              payload: {
-                template_type: 'generic',
-                elements: templateElements.reverse()
-              }
-            }
-          }
-        };
-
-        callSendAPI(messageData);
-      }
-    ).catch(err => {
-      console.log(err);
+          sectionButton('Get options', 'QR_GET_PRODUCT_OPTIONS', { id: product.id }),
+        ],
+      });
     });
 
-  }
+    const messageData = {
+      recipient: {
+        id: recipientId,
+      },
+      message: {
+        attachment: {
+          type: 'template',
+          payload: {
+            template_type: 'generic',
+            elements: templateElements.reverse(),
+          },
+        },
+      },
+    };
+
+    callSendAPI(messageData);
+  }).catch((err) => {
+    console.log(err);
+  });
+}
 
 /*
  * Delivery Confirmation Event
  *
- * This event is sent to confirm the delivery of a message. Read more about 
+ * This event is sent to confirm the delivery of a message. Read more about
  * these fields at https://developers.facebook.com/docs/messenger-platform/webhook-reference/message-delivered
  *
  */
 function receivedDeliveryConfirmation(event) {
-  var senderID = event.sender.id; // the user who sent the message
-  var recipientID = event.recipient.id; // the page they sent it from
-  var delivery = event.delivery;
-  var messageIDs = delivery.mids;
-  var watermark = delivery.watermark;
-  var sequenceNumber = delivery.seq;
+  // const senderID = event.sender.id; // the user who sent the message
+  // const recipientID = event.recipient.id; // the page they sent it from
+  const { delivery: { watermark, mids: messageIDs } } = event;
+  // const sequenceNumber = delivery.seq;
 
   if (messageIDs) {
-    messageIDs.forEach(function(messageID) {
-      console.log('[receivedDeliveryConfirmation] Message with ID %s was delivered', 
-        messageID);
+    messageIDs.forEach((messageID) => {
+      console.log('[receivedDeliveryConfirmation] Message with ID %s was delivered', messageID);
     });
   }
 
@@ -724,20 +736,20 @@ function receivedDeliveryConfirmation(event) {
 /*
  * Postback Event
  *
- * This event is called when a postback is tapped on a Structured Message. 
+ * This event is called when a postback is tapped on a Structured Message.
  * https://developers.facebook.com/docs/messenger-platform/webhook-reference/postback-received
- * 
+ *
  */
 function receivedPostback(event) {
-  var senderID = event.sender.id;
-  var recipientID = event.recipient.id;
-  var timeOfPostback = event.timestamp;
+  const senderID = event.sender.id;
+  const recipientID = event.recipient.id;
+  const timeOfPostback = event.timestamp;
 
-  // The 'payload' param is a developer-defined field which is set in a postback 
-  // button for Structured Messages. 
-  var payload = event.postback.payload;
+  // The 'payload' param is a developer-defined field which is set in a postback
+  // button for Structured Messages.
+  const { payload } = event.postback;
 
-  console.log('[receivedPostback] from user (%d) on page (%d) with payload (\'%s\') ' + 
+  console.log('[receivedPostback] from user (%d) on page (%d) with payload (\'%s\') ' +
     'at (%d)', senderID, recipientID, payload, timeOfPostback);
 
   respondToHelpRequestWithTemplates(senderID, payload);
@@ -748,47 +760,17 @@ function receivedPostback(event) {
  *
  */
 function sendTextMessage(recipientId, messageText) {
-  var messageData = {
+  const messageData = {
     recipient: {
-      id: recipientId
+      id: recipientId,
     },
     message: {
       text: messageText, // utf-8, 640-character max
-      metadata: 'DEVELOPER_DEFINED_METADATA'
-    }
+      metadata: 'DEVELOPER_DEFINED_METADATA',
+    },
   };
 
   callSendAPI(messageData);
-}
-
-/*
- * Call the Send API. The message data goes in the body. If successful, we'll 
- * get the message id in a response 
- *
- */
-function callSendAPI(messageData) {
-  request({
-    uri: 'https://graph.facebook.com/v2.6/me/messages',
-    qs: { access_token: FB_PAGE_ACCESS_TOKEN },
-    method: 'POST',
-    json: messageData
-
-  }, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      var recipientId = body.recipient_id;
-      var messageId = body.message_id;
-
-      if (messageId) {
-        console.log('[callSendAPI] Successfully sent message with id %s to recipient %s', 
-          messageId, recipientId);
-      } else {
-      console.log('[callSendAPI] Successfully called Send API for recipient %s', 
-        recipientId);
-      }
-    } else {
-      console.error('[callSendAPI] Send API call failed', response.statusCode, response.statusMessage, body.error);
-    }
-  });
 }
 
 /*
