@@ -381,18 +381,18 @@ function matchItem(itemType, usrColors) {
   let curDist = 200000;
   // fill color distances
   if (itemType === BOTTOM || itemType === FOOTWEAR) {
-    for (let i = 0; i < store.apparel_tops.length; i += 1) { // i - iterates apparel
+    for (let i = 0; i < store.apparelTops.length; i += 1) { // i - iterates apparel
       for (let j = 0; j < usrColors.length; j += 1) { // j - iterates usr colors
-        for (let k = 0; k < store.apparel_items[0][store.apparel_tops[i]].color_hex.length;
+        for (let k = 0; k < store.apparelItems[0][store.apparelTops[i]].color_hex.length;
           k += 1) {
           curDist += colorDistance(
             usrColors[j],
-            store.apparel_items[0][store.apparel_tops[i]].color_hex[k],
+            store.apparelItems[0][store.apparelTops[i]].color_hex[k],
           );
           numcomps += 1;
         }
       }
-      console.log('Color distance for (%s) is (%d)', store.apparel_tops[i], curDist / numcomps);
+      console.log('Color distance for (%s) is (%d)', store.apparelTops[i], curDist / numcomps);
       distances.push([i, curDist / numcomps]);
       curDist = 0;
       numcomps = 0;
@@ -403,25 +403,25 @@ function matchItem(itemType, usrColors) {
     console.log(distances);
     distances.reverse();
 
-    console.log(store.apparel_tops[distances[0][0]]);
+    console.log(store.apparelTops[distances[0][0]]);
 
-    ret.push([store.apparel_items[0][store.apparel_tops[distances[2][0]]].id,
-      store.apparel_items[0][store.apparel_tops[distances[1][0]]].id,
-      store.apparel_items[0][store.apparel_tops[distances[0][0]]].id]);
+    ret.push([store.apparelItems[0][store.apparelTops[distances[2][0]]].id,
+      store.apparelItems[0][store.apparelTops[distances[1][0]]].id,
+      store.apparelItems[0][store.apparelTops[distances[0][0]]].id]);
   }
   if (itemType === TOP || itemType === FOOTWEAR) {
-    for (let i = 0; i < store.apparel_bottoms.length; i += 1) { // i - iterates apparel
+    for (let i = 0; i < store.apparelBottoms.length; i += 1) { // i - iterates apparel
       for (let j = 0; j < usrColors.length; j += 1) { // j - iterates usr colors
-        for (let k = 0; k < store.apparel_items[0][store.apparel_bottoms[i]].color_hex.length;
+        for (let k = 0; k < store.apparelItems[0][store.apparelBottoms[i]].color_hex.length;
           k += 1) {
           curDist += colorDistance(
             usrColors[j],
-            store.apparel_items[0][store.apparel_bottoms[i]].color_hex[k],
+            store.apparelItems[0][store.apparelBottoms[i]].color_hex[k],
           );
           numcomps += 1;
         }
       }
-      console.log('Color distance for (%s) is (%d)', store.apparel_bottoms[i], curDist / numcomps);
+      console.log('Color distance for (%s) is (%d)', store.apparelBottoms[i], curDist / numcomps);
       distances.push([i, curDist / numcomps]);
       curDist = 0;
       numcomps = 0;
@@ -431,11 +431,11 @@ function matchItem(itemType, usrColors) {
 
     console.log(distances);
     distances.reverse();
-    console.log(store.apparel_bottoms[distances[0][0]]);
+    console.log(store.apparelBottoms[distances[0][0]]);
 
-    ret.push([store.apparel_items[0][store.apparel_bottoms[distances[2][0]]].id,
-      store.apparel_items[0][store.apparel_bottoms[distances[1][0]]].id,
-      store.apparel_items[0][store.apparel_bottoms[distances[0][0]]].id]);
+    ret.push([store.apparelItems[0][store.apparelBottoms[distances[2][0]]].id,
+      store.apparelItems[0][store.apparelBottoms[distances[1][0]]].id,
+      store.apparelItems[0][store.apparelBottoms[distances[0][0]]].id]);
   }
 
   return ret;
@@ -526,6 +526,7 @@ function receivedMessage(event) {
       return;
     }
     if (prediction) {
+      console.log('prediction');
       const col = prediction.colour.then(res => res.colors);
       const type = prediction.apparelType.then(res => res.concepts);
       console.log(typeof type);
@@ -537,18 +538,19 @@ function receivedMessage(event) {
           const FOOTWEAR = 3;
           let foundtype = 0;
           const realtype = ty[0].name.toLowerCase().replace(/[.,\\/#!?$%^&*;:{}=\-_`~()\s']/g, '');
-          for (let i = 0; i < apparel.apparel_tops.length; i += 1) {
-            if (realtype === apparel.apparel_tops[i]) {
+          console.log(realtype);
+          for (let i = 0; i < apparel.apparelTops.length; i += 1) {
+            if (realtype === apparel.apparelTops[i]) {
               foundtype = TOP;
             }
           }
-          for (let i = 0; i < apparel.apparel_bottoms.length; i += 1) {
-            if (realtype === apparel.apparel_bottoms[i]) {
+          for (let i = 0; i < apparel.apparelBottoms.length; i += 1) {
+            if (realtype === apparel.apparelBottoms[i]) {
               foundtype = BOTTOM;
             }
           }
-          for (let i = 0; i < apparel.apparel_footwear.length; i += 1) {
-            if (realtype === apparel.apparel_footwear[i]) {
+          for (let i = 0; i < apparel.apparelFootwear.length; i += 1) {
+            if (realtype === apparel.apparelFootwear[i]) {
               foundtype = FOOTWEAR;
             }
           }
