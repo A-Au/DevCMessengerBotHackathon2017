@@ -8,62 +8,31 @@
  */
 
 /* jshint node: true, devel: true */
-'use strict';
 
-//import apparel_tops from './apparel_list';
+const bodyParser = require('body-parser');
+const config = require('config');
+const crypto = require('crypto');
+const express = require('express');
+// const https = require('https');
+const request = require('request');
+const Shopify = require('shopify-api-node');
+const Clarifai = require('clarifai');
+const store = require('./store_apparel_tags.js');
+const Greeting = require('greeting');
+const apparel = require('./apparel_list.js');
 
-const 
-  bodyParser = require('body-parser'),
-  config = require('config'),
-  crypto = require('crypto'),
-  express = require('express'),
-  https = require('https'),  
-  request = require('request'),
-  Shopify = require('shopify-api-node'),
-  Clarifai = require('clarifai'),
-  store = require('./store_apparel_tags.js'),
-  Greeting = require('greeting'),
-  apparel = require('./apparel_list.js');
-
-let appClarifai = new Clarifai.App({
- apiKey: 'cc1cdb1c7b6145dc868d5e00b8965594'
+const appClarifai = new Clarifai.App({
+  apiKey: 'cc1cdb1c7b6145dc868d5e00b8965594',
 });
 
-let app = express();
-app.set('port', process.env.PORT || 5000);
-app.set('view engine', 'ejs');
-app.use(bodyParser.json({ verify: verifyRequestSignature }));
-app.use(express.static('public'));
-
-function clarifai_predict(url){
-  const colour = appClarifai.models.predict(Clarifai.COLOR_MODEL, url).then(
-      (response, error) => {
-        //console.log(JSON.stringify(response.outputs[0].data));
-        return response.outputs[0].data;
-      }
-    );
-  const apparel_type = appClarifai.models.predict(Clarifai.APPAREL_MODEL, url).then(
-        (response, error) => {
-          //console.log(JSON.stringify(response.outputs[0].data));
-          return response.outputs[0].data;
-        }
-      );
-
-  const prediction = { colour, apparel_type };
-  console.log(JSON.stringify(prediction.colour.then(res => res)));
-  //prediction.then(r => r.colour.then(res => console.log('aaaa' + JSON.stringify(res))));
-  console.log('a');
-  return prediction;
-}
-
 /*
- * Open config/default.json and set your config values before running this code. 
+ * Open config/default.json and set your config values before running this code.
  * You can also set them using environment constiables.
  *
  */
 
 // App Secret can be retrieved from the App Dashboard
-const FB_APP_SECRET = (process.env.FB_APP_SECRET) ? 
+const FB_APP_SECRET = (process.env.FB_APP_SECRET) ?
   process.env.FB_APP_SECRET :
   config.get('fb_appSecret');
 
@@ -77,24 +46,25 @@ const FB_PAGE_ACCESS_TOKEN = (process.env.FB_PAGE_ACCESS_TOKEN) ?
   (process.env.FB_PAGE_ACCESS_TOKEN) :
   config.get('fb_pageAccessToken');
 
-const SHOPIFY_SHOP_NAME = (process.env.SHOP_NAME) ? 
+const SHOPIFY_SHOP_NAME = (process.env.SHOP_NAME) ?
   process.env.SHOP_NAME :
-  config.get('sh_shopName');  
+  config.get('sh_shopName');
 
-const SHOPIFY_API_KEY = (process.env.SHOP_API_KEY) ? 
+const SHOPIFY_API_KEY = (process.env.SHOP_API_KEY) ?
   process.env.SHOP_API_KEY :
-  config.get('sh_apiKey');  
+  config.get('sh_apiKey');
 
-const SHOPIFY_API_PASSWORD = (process.env.SHOP_API_PASSWORD) ? 
+const SHOPIFY_API_PASSWORD = (process.env.SHOP_API_PASSWORD) ?
   process.env.SHOP_API_PASSWORD :
-  config.get('sh_apiPassword');  
+  config.get('sh_apiPassword');
 
-const HOST_URL = (process.env.HOST_URL) ? 
+const HOST_URL = (process.env.HOST_URL) ?
   process.env.HOST_URL :
-  config.get('host_url');  
+  config.get('host_url');
 
 // make sure that everything has been properly configured
-if (!(FB_APP_SECRET && FB_VALIDATION_TOKEN && FB_PAGE_ACCESS_TOKEN && SHOPIFY_SHOP_NAME && SHOPIFY_API_KEY && SHOPIFY_API_PASSWORD && HOST_URL)) {
+if (!(FB_APP_SECRET && FB_VALIDATION_TOKEN && FB_PAGE_ACCESS_TOKEN && SHOPIFY_SHOP_NAME &&
+  SHOPIFY_API_KEY && SHOPIFY_API_PASSWORD && HOST_URL)) {
   console.error('Missing config values');
   process.exit(1);
 }
@@ -102,8 +72,78 @@ if (!(FB_APP_SECRET && FB_VALIDATION_TOKEN && FB_PAGE_ACCESS_TOKEN && SHOPIFY_SH
 const shopify = new Shopify({
   shopName: SHOPIFY_SHOP_NAME,
   apiKey: SHOPIFY_API_KEY,
-  password: SHOPIFY_API_PASSWORD
+  password: SHOPIFY_API_PASSWORD,
 });
+
+
+const app = express();
+
+
+/*
+ * Verify that the callback came from Facebook. Using the App Secret from
+ * your App Dashboard, we can verify the signature that is sent with each
+ * callback in the x-hub-signature field, located in the header.
+ *
+ * https://developers.facebook.com/docs/graph-api/webhooks#setup
+ *
+ */
+function verifyRequestSignature(req, res, buf) {
+  const signature = req.headers['x-hub-signature'];
+
+  if (!signature) {
+    // In DEV, log an error. In PROD, throw an error.
+    console.error('Couldn\'t validate the signature.');
+  } else {
+    const elements = signature.split('=');
+    // const method = elements[0];
+    const signatureHash = elements[1];
+
+    const expectedHash = crypto.createHmac('sha1', FB_APP_SECRET)
+      .update(buf)
+      .digest('hex');
+
+    // console.log('signatureHash: ' + signatureHash);
+    // console.log('expectedHash: ' + expectedHash);
+
+    if (signatureHash !== expectedHash) {
+      throw new Error('Couldn\'t validate the request signature.');
+    }
+  }
+}
+
+
+app.set('port', process.env.PORT || 5000);
+app.set('view engine', 'ejs');
+app.use(bodyParser.json({ verify: verifyRequestSignature }));
+app.use(express.static('public'));
+
+
+function clarifaiPredict(url) {
+  const colour = appClarifai.models.predict(Clarifai.COLOR_MODEL, url).then(response => (
+    response.outputs[0].data
+  ));
+  const apparelType = appClarifai.models.predict(Clarifai.APPAREL_MODEL, url).then(response => (
+    // console.log(JSON.stringify(response.outputs[0].data));
+    response.outputs[0].data
+  ));
+
+  const prediction = { colour, apparelType };
+  console.log(JSON.stringify(prediction.colour.then(res => res)));
+  // prediction.then(r => r.colour.then(res => console.log('aaaa' + JSON.stringify(res))));
+  console.log('a');
+  return prediction;
+}
+
+
+const sectionButton = (title, action, options) => {
+  // const payload = options | {};
+  const payload = Object.assign(options, { action });
+  return {
+    type: 'postback',
+    title,
+    payload: JSON.stringify(payload),
+  };
+};
 
 
 /*
@@ -133,462 +173,24 @@ function callSendAPI(messageData) {
   });
 }
 
-
 /*
- * Verify that the callback came from Facebook. Using the App Secret from 
- * your App Dashboard, we can verify the signature that is sent with each 
- * callback in the x-hub-signature field, located in the header.
- *
- * https://developers.facebook.com/docs/graph-api/webhooks#setup
+ * Send a text message using the Send API.
  *
  */
-function verifyRequestSignature(req, res, buf) {
-  const signature = req.headers['x-hub-signature'];
-
-  if (!signature) {
-    // In DEV, log an error. In PROD, throw an error.
-    console.error('Couldn\'t validate the signature.');
-  } else {
-    const elements = signature.split('=');
-    const method = elements[0];
-    const signatureHash = elements[1];
-
-    const expectedHash = crypto.createHmac('sha1', FB_APP_SECRET)
-                        .update(buf)
-                        .digest('hex');
-
-    //console.log('signatureHash: ' + signatureHash);
-    //console.log('expectedHash: ' + expectedHash);
-
-    if (signatureHash != expectedHash) {
-      throw new Error('Couldn\'t validate the request signature.');
-    }
-  }
-}
-
-/*
- * Use your own validation token. Check that the token used in the Webhook 
- * setup is the same token used here.
- *
- */
-app.get('/webhook', function(req, res) {
-  if (req.query['hub.mode'] === 'subscribe' &&
-      req.query['hub.verify_token'] === FB_VALIDATION_TOKEN) {
-    console.log('[app.get] Validating webhook');
-    res.status(200).send(req.query['hub.challenge']);
-  } else {
-    console.error('Failed validation. Make sure the validation tokens match.');
-    res.sendStatus(403);          
-  }  
-});
-
-/**
- * serves a static page for the webview
- */ 
-app.get('/product_description', function(req, res) {
-  const product_id = req.query['id'];
-  if (product_id !== 'null') {
-    console.log('[app.get] product id:' + product_id);
-    const shProduct = shopify.product.get(product_id);
-    shProduct.then(function(product) {
-      console.log(product.options[0].values);
-      res.status(200).send(product.body_html);
-    }, function(error) {
-      console.error('Error retrieving product');
-      res.sendStatus(400).send('Error retrieving product');
-    });
-    
-  } else {
-    console.error('Product id is required');
-    res.sendStatus(400).send('Product id is required');          
-  }  
-});
-
-/*
- * All callbacks for Messenger are POST-ed. They will be sent to the same
- * webhook. Be sure to subscribe your app to your page to receive callbacks
- * for your page. 
- * https://developers.facebook.com/docs/messenger-platform/product-overview/setup#subscribe_app
- *
- */
-app.post('/webhook', function (req, res) {
-  // You must send back a status 200 to let the Messenger Platform know that you've
-  // received the callback. Do that right away because the countdown doesn't stop when 
-  // you're paused on a breakpoint! Otherwise, the request might time out. 
-  res.sendStatus(200);
-        
-  const data = req.body;
-
-  // Make sure this is a page subscription
-  if (data.object == 'page') {
-    // entries may be batched so iterate over each one
-    data.entry.forEach(function(pageEntry) {
-      const pageID = pageEntry.id;
-      const timeOfEvent = pageEntry.time;
-
-      // iterate over each messaging event
-      pageEntry.messaging.forEach(function(messagingEvent) {
-
-        let propertyNames = [];
-        for (const prop in messagingEvent) { propertyNames.push(prop)}
-        console.log('[app.post] Webhook received a messagingEvent with properties: ', propertyNames.join());
-        
-        if (messagingEvent.message) {
-          // someone sent a message
-          receivedMessage(messagingEvent);
-
-        } else if (messagingEvent.delivery) {
-          // messenger platform sent a delivery confirmation
-          receivedDeliveryConfirmation(messagingEvent);
-
-        } else if (messagingEvent.postback) {
-          // user replied by tapping one of our postback buttons
-          receivedPostback(messagingEvent);
-
-        } else {
-          console.log('[app.post] Webhook is not prepared to handle this message.');
-
-        }
-      });
-    });
-  }
-});
-
-/*
- * Parse Color
- *
- * Returns an rgb from the form #rrggbb
- */
-function parseColor(hash){
-
-  const ret = [-1,-1,-1];
-
-  ret[0] = parseInt('0x'+hash.substr(1,2));
-  ret[1] = parseInt('0x'+hash.substr(3,2));
-  ret[2] = parseInt('0x'+hash.substr(5,2));
-  //console.log(hash);
-  //console.log(hash.substr(1,2));
-  //console.log(hash.substr(3,2));
-  //console.log(hash.substr(5,2));
-
-  return ret;
-}
-
-/*
- * Color Distance
- *
- * Just returns a single value based on squared error between rgb values
- *
- * Input is understood to be of the format #rrggbb
- */
-function colorDistance(hash1, hash2){
-  //console.log('hash1 ' + hash1);
-  //console.log('hash2 ' + hash2);
-  const dist = -1;
-  const rgb1 = parseColor(hash1);
-  const rgb2 = parseColor(hash2);
-  //console.log('hash1 ' + rgb1);
-  //console.log('hash2 ' + rgb2);
-  const validColors = 0;
-
-  // calculate distance
-  dist = (rgb1[0] - rgb2[0]) * (rgb1[0] - rgb2[0]) +
-         (rgb1[1] - rgb2[1]) * (rgb1[1] - rgb2[1]) +
-         (rgb1[2] - rgb2[2]) * (rgb1[2] - rgb2[2]);
-
-  return dist;
-}
-
-/*
- * Compare Color Dist
- *
- * Compares two color distances from indices in the apparel items list
- *
- * For use in array.sort(compareFunction)
- * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
- */
- function compareDist(a, b){
-  // a, b are [index, distance]
-  if( a[1] > b[1] )
-  {
-    return 1;
-  }
-  else if( a[1] == b[1] )
-  {
-    return 0;
-  }
-  else
-  {
-    return -1;
-  }
-
- }
-
-/*
- *
- * Match Item
- *
- * This function searches through the store's labelled json object to find
- * any items that might match based on the colors
- *
- * We want to give back an item with high contrast and an item with low contrast.
- *
- * Therefore, we sort by color distance and return the first and last elements
- * of the list.
- */
- ;
-function matchItem(item_type, usr_colors){
-  console.log(store);
-  const TOP = 1;
-  const BOTTOM = 2;
-  const FOOTWEAR = 3;
-  const curDist = 200000;     const lowestIdx = -1;
-  const lowestDist = 200000;  const highestIdx = -1;
-  const highestDist = -1;
-  const numcomps = 0;
-  const distances = [];
-  const ret = [];
-  // fill color distances
-  if(item_type == BOTTOM || item_type == FOOTWEAR) {
-    for(const i = 0; i < store.apparel_tops.length; i ++){      // i - iterates apparel
-      for(const j = 0; j < usr_colors.length; j ++){            // j - iterates usr colors
-        for(const k = 0; k < store.apparel_items[0][store.apparel_tops[i]].color_hex.length; k++){
-          curDist += colorDistance(usr_colors[j], store.apparel_items[0][store.apparel_tops[i]].color_hex[k]);
-          numcomps ++;
-        }
-      }
-      console.log('Color distance for (%s) is (%d)', store.apparel_tops[i], curDist/numcomps);
-      distances.push([i, curDist/numcomps]);
-      curDist = 0;
-      numcomps = 0;
-    }
-    // then sort!
-    distances.sort(compareDist);
-
-    console.log(distances);
-    distances.reverse();
-
-    console.log(store.apparel_tops[distances[0][0]]);
-
-    ret.push( [store.apparel_items[0][store.apparel_tops[distances[2][0]]].id,
-            store.apparel_items[0][store.apparel_tops[distances[1][0]]].id,
-            store.apparel_items[0][store.apparel_tops[distances[0][0]]].id]);
-  }
-  if(item_type == TOP || item_type == FOOTWEAR){
-    for(const i = 0; i < store.apparel_bottoms.length; i ++){      // i - iterates apparel
-      for(const j = 0; j < usr_colors.length; j ++){            // j - iterates usr colors
-        for(const k = 0; k < store.apparel_items[0][store.apparel_bottoms[i]].color_hex.length; k++){
-          curDist += colorDistance(usr_colors[j], store.apparel_items[0][store.apparel_bottoms[i]].color_hex[k]);
-          numcomps ++;
-        }
-      }
-      console.log('Color distance for (%s) is (%d)', store.apparel_bottoms[i], curDist/numcomps);
-      distances.push([i, curDist/numcomps]);
-      curDist = 0;
-      numcomps = 0;
-    }
-    // then sort!
-    distances.sort(compareDist);
-
-    console.log(distances);
-    distances.reverse();
-    console.log(store.apparel_bottoms[distances[0][0]]);
-
-    ret.push( [store.apparel_items[0][store.apparel_bottoms[distances[2][0]]].id,
-            store.apparel_items[0][store.apparel_bottoms[distances[1][0]]].id,
-            store.apparel_items[0][store.apparel_bottoms[distances[0][0]]].id] );
-  }
-
-  return ret;
-};
-
-/*
- * Message Event
- *
- * This event is called when a message is sent to your page. The 'message' 
- * object format can consty depending on the kind of message that was received.
- * Read more at https://developers.facebook.com/docs/messenger-platform/webhook-reference/message-received
- * 
- */
-function receivedMessage(event) {
-  const senderID = event.sender.id;
-  const pageID = event.recipient.id;
-  const timeOfMessage = event.timestamp;
-  const message = event.message;
-
-  //shopify.product.get(229020762139).then(res => console.log(JSON.stringify(res)));
-
-  console.log('[receivedMessage] user (%d) page (%d) timestamp (%d) and message (%s)', 
-    senderID, pageID, timeOfMessage, JSON.stringify(message));
-  console.log(message);
-
-  if (message.attachments && message.attachments.length >= 1 && message.attachments[0] && message.attachments[0].payload && message.attachments[0].payload.url) {
-    const url = message.attachments[0].payload.url;
-    console.log('[receivedMessage] image url: (%s)', url);
-    const prediction = clarifai_predict(url);
-    console.log(JSON.stringify(prediction));
-    if (message.quick_reply) {
-      console.log('[receivedMessage] quick_reply.payload (%s)', 
-        message.quick_reply.payload);
-      handleQuickReplyResponse(event);
-      return;
-    }
-    if (prediction) {
-      const col = prediction.colour.then(res => res.colors);//[0].w3c.name);
-      const type = prediction.apparel_type.then(res => res.concepts);//[0].name);
-      prediction.colour.then(res => console.log('aaaa' + typeof res.colors[0].w3c.name));
-      console.log(typeof type);
-      console.log(type);
-      col.then(co => {type.then(ty => {
-        const TOP = 1;
-        const BOTTOM = 2;
-        const FOOTWEAR = 3;
-        const hits = [0,0,0];
-        const foundtype = 0;
-        const realtype = ty[0].name.toLowerCase().replace(/[.,\/#!?$%\^&\*;:{}=\-_`~()\s']/g,'');
-        for(const i = 0; i < apparel.apparel_tops.length; i ++){
-          if(realtype == apparel.apparel_tops[i]){
-            foundtype = TOP;
-          }
-        }
-        for(const i = 0; i < apparel.apparel_bottoms.length; i ++){
-          if(realtype == apparel.apparel_bottoms[i]){
-            foundtype = BOTTOM;
-          }
-        }
-        for(const i = 0; i < apparel.apparel_footwear.length; i ++){
-          if(realtype == apparel.apparel_footwear[i]){
-            foundtype = FOOTWEAR;
-          }
-        }
-        console.log('Found a ' + foundtype);
-        sendSimilarProducts(senderID, matchItem(foundtype, [co[0].w3c.hex, co[1].w3c.hex] ));
-        console.log(
-          ' ' + co.length + ' ' + ty.length +
-          co[0].w3c.hex + ' ' +
-          co[1].w3c.hex + ' ' +
-          //co[2].w3c.name.toLowerCase() + ' ' +
-          ty[0].name.toLowerCase() + ' ' +
-          ty[1].name.toLowerCase() + ' ' +
-          ty[2].name.toLowerCase());
-        })
-
-        //sendSimilarProducts(senderID, matchItem(1, [co[0].w3c.hex, co[1].w3c.hex] ));
-      });
-
-      sendTextMessage(senderID, 'Alright, let me see what I can find for you.');
-    }
-  } else {
-
-    const messageText = message.text;
-    if (messageText) {
-
-      const lcm = messageText.toLowerCase().replace(/[.,\/#!?$%\^&\*;:{}=\-_`~()\s']/g,'');
-      console.log(lcm);
-      switch (lcm) {
-        case 'hi':
-        case 'hello':
-        case 'yo':
-        case 'hey':
-        case 'hay':
-        case 'howdy':
-        case 'sup':
-        case 'heyman':
-        case 'howsitgoing':
-        case 'howareyoudoing':
-        case 'whatsup':
-        case 'wassup':
-        case 'whatsgoingon':
-        case 'goodmorning':
-        case 'goodevening':
-        case 'goodafternoon':
-        case 'whazzup':
-        case 'hiya':
-        case 'gday':
-          sendTextMessage(senderID, Greeting.random());
-          break;
-        case 'help':
-          sendTextMessage(senderID, 'Try sending us a picture of a piece of apparel like your favourite pair of pants and we will try and find the perfect match for them!');
-          //sendHelpOptionsAsButtonTemplates(senderID);
-          break;
-
-        case 'test':
-          console.log('asdasdas' + matchItem(1, ['#ffffff']));
-          sendSimilarProducts(senderID, matchItem(1, ['#ffffff']));
-          break;
-
-        case 'test2':
-          matchItem(1, ['#ffffff']);
-          break;
-        
-        default:
-          // otherwise, just echo it back to the sender
-          sendTextMessage(senderID, messageText);
-      }
-    }
-  }
-}
-
-
-/*
- * Send a message with buttons.
- *
- */
-function sendHelpOptionsAsButtonTemplates(recipientId) {
-  console.log('[sendHelpOptionsAsButtonTemplates] Sending the help options menu'); 
+function sendTextMessage(recipientId, messageText) {
   const messageData = {
     recipient: {
-      id: recipientId
+      id: recipientId,
     },
-    message:{
-      attachment:{
-        type:'template',
-        payload:{
-          template_type:'button',
-          text:'Click the button before to get a list of 3 of our products.',
-          buttons:[
-            {
-              'type':'postback',
-              'title':'Get 3 products',
-              'payload':JSON.stringify({action: 'QR_GET_PRODUCT_LIST', limit: 3})
-            }
-            // limit of three buttons 
-          ]
-        }
-      }
-    }
+    message: {
+      text: messageText, // utf-8, 640-character max
+      metadata: 'DEVELOPER_DEFINED_METADATA',
+    },
   };
 
   callSendAPI(messageData);
 }
 
-/*
- * Someone tapped one of the Quick Reply buttons so 
- * respond with the appropriate content
- *
- */
-function handleQuickReplyResponse(event) {
-  const senderID = event.sender.id;
-  const pageID = event.recipient.id;
-  const message = event.message;
-  const quickReplyPayload = message.quick_reply.payload;
-  
-  console.log('[handleQuickReplyResponse] Handling quick reply response (%s) from sender (%d) to page (%d) with message (%s)', 
-    quickReplyPayload, senderID, pageID, JSON.stringify(message));
-  
-  // use branched conversation with one interaction per feature (each of which contains a constiable number of content pieces)
-  respondToHelpRequestWithTemplates(senderID, quickReplyPayload);
-}
-
-const sectionButton = (title, action, options) => {
-  // const payload = options | {};
-  const payload = Object.assign(options, { action });
-  return {
-    type: 'postback',
-    title,
-    payload: JSON.stringify(payload),
-  };
-};
 
 /*
  * This response uses templateElements to present the user with a carousel
@@ -668,6 +270,178 @@ function respondToHelpRequestWithTemplates(recipientId, requestForHelpOnFeature)
   }
 }
 
+
+/*
+ * Someone tapped one of the Quick Reply buttons so
+ * respond with the appropriate content
+ *
+ */
+function handleQuickReplyResponse(event) {
+  const senderID = event.sender.id;
+  const pageID = event.recipient.id;
+  const { message } = event;
+  const quickReplyPayload = message.quick_reply.payload;
+
+  console.log(
+    '[handleQuickReplyResponse] Handling quick reply response (%s) from sender (%d) to page (%d) with message (%s)',
+    quickReplyPayload,
+    senderID,
+    pageID,
+    JSON.stringify(message),
+  );
+  // use branched conversation with one interaction per feature
+  // (each of which contains a constiable number of content pieces)
+  respondToHelpRequestWithTemplates(senderID, quickReplyPayload);
+}
+
+
+/*
+ * Parse Color
+ *
+ * Returns an rgb from the form #rrggbb
+ */
+function parseColor(hash) {
+  const ret = [-1, -1, -1];
+
+  ret[0] = parseInt(`0x${hash.substr(1, 2)}`, 16);
+  ret[1] = parseInt(`0x${hash.substr(3, 2)}`, 16);
+  ret[2] = parseInt(`0x${hash.substr(5, 2)}`, 16);
+  // console.log(hash);
+  // console.log(hash.substr(1,2));
+  // console.log(hash.substr(3,2));
+  // console.log(hash.substr(5,2));
+
+  return ret;
+}
+
+/*
+ * Color Distance
+ *
+ * Just returns a single value based on squared error between rgb values
+ *
+ * Input is understood to be of the format #rrggbb
+ */
+function colorDistance(hash1, hash2) {
+  // console.log('hash1 ' + hash1);
+  // console.log('hash2 ' + hash2);
+  let dist = -1;
+  const rgb1 = parseColor(hash1);
+  const rgb2 = parseColor(hash2);
+  // console.log('hash1 ' + rgb1);
+  // console.log('hash2 ' + rgb2);
+
+  // calculate distance
+  dist = ((rgb1[0] - rgb2[0]) * (rgb1[0] - rgb2[0])) +
+         ((rgb1[1] - rgb2[1]) * (rgb1[1] - rgb2[1])) +
+         ((rgb1[2] - rgb2[2]) * (rgb1[2] - rgb2[2]));
+
+  return dist;
+}
+
+/*
+ * Compare Color Dist
+ *
+ * Compares two color distances from indices in the apparel items list
+ *
+ * For use in array.sort(compareFunction)
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+ */
+function compareDist(a, b) {
+  // a, b are [index, distance]
+  if (a[1] > b[1]) {
+    return 1;
+  } else if (a[1] === b[1]) {
+    return 0;
+  }
+  return -1;
+}
+
+
+/*
+ *
+ * Match Item
+ *
+ * This function searches through the store's labelled json object to find
+ * any items that might match based on the colors
+ *
+ * We want to give back an item with high contrast and an item with low contrast.
+ *
+ * Therefore, we sort by color distance and return the first and last elements
+ * of the list.
+ */
+function matchItem(itemType, usrColors) {
+  console.log(store);
+  const TOP = 1;
+  const BOTTOM = 2;
+  const FOOTWEAR = 3;
+  const distances = [];
+  const ret = [];
+
+  let numcomps = 0;
+  let curDist = 200000;
+  // fill color distances
+  if (itemType === BOTTOM || itemType === FOOTWEAR) {
+    for (let i = 0; i < store.apparel_tops.length; i += 1) { // i - iterates apparel
+      for (let j = 0; j < usrColors.length; j += 1) { // j - iterates usr colors
+        for (let k = 0; k < store.apparel_items[0][store.apparel_tops[i]].color_hex.length;
+          k += 1) {
+          curDist += colorDistance(
+            usrColors[j],
+            store.apparel_items[0][store.apparel_tops[i]].color_hex[k],
+          );
+          numcomps += 1;
+        }
+      }
+      console.log('Color distance for (%s) is (%d)', store.apparel_tops[i], curDist / numcomps);
+      distances.push([i, curDist / numcomps]);
+      curDist = 0;
+      numcomps = 0;
+    }
+    // then sort!
+    distances.sort(compareDist);
+
+    console.log(distances);
+    distances.reverse();
+
+    console.log(store.apparel_tops[distances[0][0]]);
+
+    ret.push([store.apparel_items[0][store.apparel_tops[distances[2][0]]].id,
+      store.apparel_items[0][store.apparel_tops[distances[1][0]]].id,
+      store.apparel_items[0][store.apparel_tops[distances[0][0]]].id]);
+  }
+  if (itemType === TOP || itemType === FOOTWEAR) {
+    for (let i = 0; i < store.apparel_bottoms.length; i += 1) { // i - iterates apparel
+      for (let j = 0; j < usrColors.length; j += 1) { // j - iterates usr colors
+        for (let k = 0; k < store.apparel_items[0][store.apparel_bottoms[i]].color_hex.length;
+          k += 1) {
+          curDist += colorDistance(
+            usrColors[j],
+            store.apparel_items[0][store.apparel_bottoms[i]].color_hex[k],
+          );
+          numcomps += 1;
+        }
+      }
+      console.log('Color distance for (%s) is (%d)', store.apparel_bottoms[i], curDist / numcomps);
+      distances.push([i, curDist / numcomps]);
+      curDist = 0;
+      numcomps = 0;
+    }
+    // then sort!
+    distances.sort(compareDist);
+
+    console.log(distances);
+    distances.reverse();
+    console.log(store.apparel_bottoms[distances[0][0]]);
+
+    ret.push([store.apparel_items[0][store.apparel_bottoms[distances[2][0]]].id,
+      store.apparel_items[0][store.apparel_bottoms[distances[1][0]]].id,
+      store.apparel_items[0][store.apparel_bottoms[distances[0][0]]].id]);
+  }
+
+  return ret;
+}
+
+
 function sendSimilarProducts(recipientId, ids) {
   const templateElements = [];
   shopify.product.list({ ids: ids.join() }).then((prods) => {
@@ -710,6 +484,169 @@ function sendSimilarProducts(recipientId, ids) {
     console.log(err);
   });
 }
+
+
+/*
+ * Message Event
+ *
+ * This event is called when a message is sent to your page. The 'message'
+ * object format can consty depending on the kind of message that was received.
+ * Read more at https://developers.facebook.com/docs/messenger-platform/webhook-reference/message-received
+ *
+ */
+function receivedMessage(event) {
+  const senderID = event.sender.id;
+  const pageID = event.recipient.id;
+  const timeOfMessage = event.timestamp;
+  const { message } = event;
+
+  // shopify.product.get(229020762139).then(res => console.log(JSON.stringify(res)));
+
+  console.log(
+    '[receivedMessage] user (%d) page (%d) timestamp (%d) and message (%s)',
+    senderID,
+    pageID,
+    timeOfMessage,
+    JSON.stringify(message),
+  );
+  console.log(message);
+
+  if (message.attachments && message.attachments.length >= 1 && message.attachments[0] &&
+    message.attachments[0].payload && message.attachments[0].payload.url) {
+    const { url } = message.attachments[0].payload;
+    console.log('[receivedMessage] image url: (%s)', url);
+    const prediction = clarifaiPredict(url);
+    console.log(JSON.stringify(prediction));
+    if (message.quick_reply) {
+      console.log(
+        '[receivedMessage] quick_reply.payload (%s)',
+        message.quick_reply.payload,
+      );
+      handleQuickReplyResponse(event);
+      return;
+    }
+    if (prediction) {
+      const col = prediction.colour.then(res => res.colors);
+      const type = prediction.apparelType.then(res => res.concepts);
+      console.log(typeof type);
+      console.log(type);
+      col.then((co) => {
+        type.then((ty) => {
+          const TOP = 1;
+          const BOTTOM = 2;
+          const FOOTWEAR = 3;
+          let foundtype = 0;
+          const realtype = ty[0].name.toLowerCase().replace(/[.,\\/#!?$%^&*;:{}=\-_`~()\s']/g, '');
+          for (let i = 0; i < apparel.apparel_tops.length; i += 1) {
+            if (realtype === apparel.apparel_tops[i]) {
+              foundtype = TOP;
+            }
+          }
+          for (let i = 0; i < apparel.apparel_bottoms.length; i += 1) {
+            if (realtype === apparel.apparel_bottoms[i]) {
+              foundtype = BOTTOM;
+            }
+          }
+          for (let i = 0; i < apparel.apparel_footwear.length; i += 1) {
+            if (realtype === apparel.apparel_footwear[i]) {
+              foundtype = FOOTWEAR;
+            }
+          }
+          console.log(`Found a ${foundtype}`);
+          sendSimilarProducts(senderID, matchItem(foundtype, [co[0].w3c.hex, co[1].w3c.hex]));
+          /* console.log(
+            ' ' + co.length + ' ' + ty.length +
+            co[0].w3c.hex + ' ' +
+            co[1].w3c.hex + ' ' +
+            //co[2].w3c.name.toLowerCase() + ' ' +
+            ty[0].name.toLowerCase() + ' ' +
+            ty[1].name.toLowerCase() + ' ' +
+            ty[2].name.toLowerCase()); */
+        });
+      });
+
+      sendTextMessage(senderID, 'Alright, let me see what I can find for you.');
+    }
+  } else {
+    const messageText = message.text;
+    if (messageText) {
+      const lcm = messageText.toLowerCase().replace(/[.,/#!?$%\\^&*;:{}=\-_`~()\s']/g, '');
+      console.log(lcm);
+      switch (lcm) {
+        case 'hi':
+        case 'hello':
+        case 'yo':
+        case 'hey':
+        case 'hay':
+        case 'howdy':
+        case 'sup':
+        case 'heyman':
+        case 'howsitgoing':
+        case 'howareyoudoing':
+        case 'whatsup':
+        case 'wassup':
+        case 'whatsgoingon':
+        case 'goodmorning':
+        case 'goodevening':
+        case 'goodafternoon':
+        case 'whazzup':
+        case 'hiya':
+        case 'gday':
+          sendTextMessage(senderID, Greeting.random());
+          break;
+        case 'help':
+          sendTextMessage(senderID, 'Try sending us a picture of a piece of apparel like your favourite pair of pants and we will try and find the perfect match for them!');
+          break;
+
+        case 'test':
+          sendSimilarProducts(senderID, matchItem(1, ['#ffffff']));
+          break;
+
+        case 'test2':
+          matchItem(1, ['#ffffff']);
+          break;
+
+        default:
+          // otherwise, just echo it back to the sender
+          sendTextMessage(senderID, messageText);
+      }
+    }
+  }
+}
+
+
+/*
+ * Send a message with buttons.
+ *
+ */
+/* function sendHelpOptionsAsButtonTemplates(recipientId) {
+  console.log('[sendHelpOptionsAsButtonTemplates] Sending the help options menu');
+  const messageData = {
+    recipient: {
+      id: recipientId,
+    },
+    message: {
+      attachment: {
+        type: 'template',
+        payload: {
+          template_type: 'button',
+          text: 'Click the button before to get a list of 3 of our products.',
+          buttons: [
+            {
+              type: 'postback',
+              title: 'Get 3 products',
+              payload: JSON.stringify({ action: 'QR_GET_PRODUCT_LIST', limit: 3 }),
+            },
+            // limit of three buttons
+          ],
+        },
+      },
+    },
+  };
+
+  callSendAPI(messageData);
+} */
+
 
 /*
  * Delivery Confirmation Event
@@ -755,23 +692,87 @@ function receivedPostback(event) {
   respondToHelpRequestWithTemplates(senderID, payload);
 }
 
+
 /*
- * Send a text message using the Send API.
+ * Use your own validation token. Check that the token used in the Webhook
+ * setup is the same token used here.
  *
  */
-function sendTextMessage(recipientId, messageText) {
-  const messageData = {
-    recipient: {
-      id: recipientId,
-    },
-    message: {
-      text: messageText, // utf-8, 640-character max
-      metadata: 'DEVELOPER_DEFINED_METADATA',
-    },
-  };
+app.get('/webhook', (req, res) => {
+  if (req.query['hub.mode'] === 'subscribe' &&
+      req.query['hub.verify_token'] === FB_VALIDATION_TOKEN) {
+    console.log('[app.get] Validating webhook');
+    res.status(200).send(req.query['hub.challenge']);
+  } else {
+    console.error('Failed validation. Make sure the validation tokens match.');
+    res.sendStatus(403);
+  }
+});
 
-  callSendAPI(messageData);
-}
+/**
+ * serves a static page for the webview
+ */
+app.get('/product_description', (req, res) => {
+  const productId = req.query.id;
+  if (productId !== 'null') {
+    console.log(`[app.get] product id: ${productId}`);
+    const shProduct = shopify.product.get(productId);
+    shProduct.then((product) => {
+      console.log(product.options[0].values);
+      res.status(200).send(product.body_html);
+    }, () => {
+      console.error('Error retrieving product');
+      res.sendStatus(400).send('Error retrieving product');
+    });
+  } else {
+    console.error('Product id is required');
+    res.sendStatus(400).send('Product id is required');
+  }
+});
+
+/*
+ * All callbacks for Messenger are POST-ed. They will be sent to the same
+ * webhook. Be sure to subscribe your app to your page to receive callbacks
+ * for your page.
+ * https://developers.facebook.com/docs/messenger-platform/product-overview/setup#subscribe_app
+ *
+ */
+app.post('/webhook', (req, res) => {
+  // You must send back a status 200 to let the Messenger Platform know that you've
+  // received the callback. Do that right away because the countdown doesn't stop when
+  // you're paused on a breakpoint! Otherwise, the request might time out.
+  res.sendStatus(200);
+  const data = req.body;
+
+  // Make sure this is a page subscription
+  if (data.object === 'page') {
+    // entries may be batched so iterate over each one
+    data.entry.forEach((pageEntry) => {
+      // const pageID = pageEntry.id;
+      // const timeOfEvent = pageEntry.time;
+      // iterate over each messaging event
+      pageEntry.messaging.forEach((messagingEvent) => {
+        const propertyNames = [];
+        Object.keys(messagingEvent).forEach(p => propertyNames.push(p));
+        // for (const prop in messagingEvent) { propertyNames.push(prop); }
+        console.log('[app.post] Webhook received a messagingEvent with properties: ', propertyNames.join());
+        if (messagingEvent.message) {
+          // someone sent a message
+          receivedMessage(messagingEvent);
+        } else if (messagingEvent.delivery) {
+          // messenger platform sent a delivery confirmation
+          receivedDeliveryConfirmation(messagingEvent);
+        } else if (messagingEvent.postback) {
+          // user replied by tapping one of our postback buttons
+          receivedPostback(messagingEvent);
+        } else {
+          console.log('[app.post] Webhook is not prepared to handle this message.');
+        }
+      });
+    });
+  }
+});
+
 
 /*
  * Send profile info. This will setup the bot with a greeting and a Get Started button

@@ -5,7 +5,7 @@
   "main": "app.js",
   "start-comment": "adding these two flags (--inspect --debug-brk) will make the node app debuggable using chrome dev tools",
   "scripts": {
-    "start": "nodemon src/app.js --exec \"npm run lint\"",
+    "start": "nodemon src/app.js --exec \"npm run lint && node\"",
     "debug": "node --nolazy --debug-brk=5858 app.js",
     "lint": "eslint src",
     "test": "echo \"Error: no test specified\" && exit 1"
